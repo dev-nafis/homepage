@@ -9,7 +9,7 @@ from app import create_app
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
     port = 5000,
 
 #Below is only for enabling https when hosting on the Unbuntu server where a certificate and key are enabled.
