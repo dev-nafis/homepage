@@ -1,0 +1,18 @@
+/* Previous dark-theme palette retained for a quick visual rollback.
+   Copy these declarations into :root[data-theme='dark'] in ../global.css. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: #edf8f3;
+  --ink-soft: #a9c2bc;
+  --paper: #071c1d;
+  --paper-raised: #0d2928;
+  --paper-muted: #133331;
+  --emerald: #6bd5bd;
+  --emerald-bright: #8ee7d2;
+  --teal-soft: #133d38;
+  --gold: #e4bd6d;
+  --gold-soft: #705b32;
+  --line: rgba(222, 243, 234, 0.14);
+  --shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.2);
+}

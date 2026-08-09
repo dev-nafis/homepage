@@ -1,0 +1,12 @@
+{
+  "provider": "Quran JSON",
+  "providerUrl": "https://github.com/risan/quran-json",
+  "version": "3.1.2",
+  "license": "CC-BY-SA-4.0",
+  "arabicSource": "The Noble Qur'an Encyclopedia",
+  "translation": "Saheeh International",
+  "translator": "Umm Muhammad",
+  "language": "English",
+  "syncedAt": "2026-08-05",
+  "migrationTarget": "Quran Foundation Content API"
+}

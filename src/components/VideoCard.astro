@@ -1,0 +1,57 @@
+---
+import Icon from './Icon.astro';
+import type { Video } from '../types';
+interface Props { video: Video; large?: boolean; }
+const { video, large = false } = Astro.props;
+---
+<article class:list={['video-card', 'card', { large }]} data-video-card>
+  <div class="video-media" data-video-media>
+    <img src={video.thumbnail} alt="" loading="lazy" referrerpolicy="no-referrer" />
+    {video.platform === 'youtube' && video.embedId ? (
+      <button type="button" class="video-play" aria-label={`Play ${video.title}`} data-video-id={video.embedId} data-video-title={video.title}><Icon name="play" size={24} /></button>
+    ) : <a class="video-play" href={video.url} target="_blank" rel="noopener" aria-label={`Open ${video.title}`}><Icon name="external" size={22} /></a>}
+    <span class="video-platform">{video.platform}</span>
+  </div>
+  <div class="video-copy">
+    <span>{video.category}{video.duration && ` · ${video.duration}`}</span>
+    <h3><a href={video.url} target="_blank" rel="noopener">{video.title}</a></h3>
+  </div>
+</article>
+
+<style>
+  .video-card { overflow: hidden; }
+  .video-media { position: relative; aspect-ratio: 16/9; overflow: hidden; background: linear-gradient(145deg,var(--emerald),var(--surface-strong)); }
+  .video-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 500ms ease; }
+  .video-card:hover img { transform: scale(1.035); }
+  .video-play { position: absolute; top: 50%; left: 50%; display: grid; width: 58px; height: 58px; padding: 0; place-items: center; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; color: var(--surface-strong); background: rgba(255,255,255,.9); box-shadow: 0 12px 30px rgba(0,0,0,.22); transform: translate(-50%,-50%); cursor: pointer; }
+  .video-play:hover { color: var(--accent-ink); background: var(--emerald); }
+  .video-platform { position: absolute; top: .85rem; left: .85rem; padding: .32rem .6rem; border-radius: 999px; color: #fff; background: rgba(3,24,23,.7); font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; backdrop-filter: blur(8px); }
+  .video-copy { padding: 1.15rem; }
+  .video-copy span { color: var(--emerald); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .video-copy h3 { margin: .45rem 0 0; }
+  .video-copy a { text-decoration: none; }
+  .large .video-copy h3 { font-size: clamp(1.35rem,3vw,2rem); }
+  .video-media :global(iframe) { display: block; width: 100%; height: 100%; border: 0; }
+</style>
+
+<script>
+  function setupVideos() {
+    document.querySelectorAll<HTMLButtonElement>('[data-video-id]').forEach((button) => {
+      if (button.dataset.ready) return;
+      button.dataset.ready = 'true';
+      button.addEventListener('click', () => {
+        const media = button.closest<HTMLElement>('[data-video-media]');
+        if (!media) return;
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube-nocookie.com/embed/${button.dataset.videoId}?autoplay=1&rel=0`;
+        iframe.title = button.dataset.videoTitle || 'YouTube video';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        media.replaceChildren(iframe);
+        (window as any).plausible?.('Video Play', { props: { video: button.dataset.videoId } });
+      });
+    });
+  }
+  setupVideos();
+  document.addEventListener('astro:page-load', setupVideos);
+</script>

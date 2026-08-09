@@ -1,0 +1,67 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+const path = Astro.url.pathname;
+---
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label={`${site.name} home`}>
+      <span class="brand-mark" aria-hidden="true">ن</span>
+      <span><strong>Nafis</strong><small>Qur’an Reciter</small></span>
+    </a>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      {site.nav.map((item) => <a class:list={{ active: path === item.href || (item.href !== '/' && path.startsWith(item.href)) }} href={item.href}>{item.label}</a>)}
+    </nav>
+    <div class="header-actions">
+      <button class="icon-button theme-toggle" type="button" aria-label="Change colour theme" data-theme-toggle><Icon name="moon" /></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle><Icon name="menu" /></button>
+    </div>
+  </div>
+  <div id="mobile-menu" class="mobile-menu" data-mobile-menu hidden>
+    <nav class="container" aria-label="Mobile navigation">
+      {site.nav.map((item, index) => <a href={item.href}><span>0{index + 1}</span>{item.label}<Icon name="arrow" /></a>)}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 100; height: var(--header-height); border-bottom: 1px solid transparent; background: color-mix(in srgb, var(--paper) 82%, transparent); backdrop-filter: blur(18px); transition: border-color 180ms ease, box-shadow 180ms ease; }
+  .site-header.scrolled { border-color: var(--line); box-shadow: 0 4px 24px rgba(5, 35, 32, .06); }
+  .header-inner { display: flex; height: 100%; align-items: center; justify-content: space-between; gap: 2rem; }
+  .brand { display: inline-flex; align-items: center; gap: .7rem; text-decoration: none; line-height: 1; }
+  .brand-mark { display: grid; width: 39px; height: 39px; place-items: center; border-radius: 50% 50% 50% 18%; color: var(--accent-ink); background: var(--emerald); font-family: 'Noto Naskh Arabic', serif; font-size: 1.35rem; transform: rotate(-5deg); }
+  .brand strong, .brand small { display: block; }
+  .brand strong { font-family: 'Playfair Display', serif; font-size: 1.08rem; }
+  .brand small { margin-top: .28rem; color: var(--ink-soft); font-size: .66rem; letter-spacing: .09em; text-transform: uppercase; }
+  .desktop-nav { display: flex; align-items: center; gap: .25rem; }
+  .desktop-nav a { padding: .55rem .8rem; border-radius: 999px; color: var(--ink-soft); font-size: .92rem; font-weight: 600; text-decoration: none; }
+  .desktop-nav a:hover, .desktop-nav a.active { color: var(--emerald); background: var(--teal-soft); }
+  .header-actions { display: flex; align-items: center; gap: .45rem; }
+  .menu-toggle { display: none; }
+  .mobile-menu { position: fixed; inset: var(--header-height) 0 auto; z-index: 99; padding: 1rem 0 1.5rem; border-bottom: 1px solid var(--line); background: var(--paper); box-shadow: var(--shadow); }
+  .mobile-menu nav { display: grid; }
+  .mobile-menu a { display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; padding: 1rem .25rem; border-bottom: 1px solid var(--line); font-family: 'Playfair Display', serif; font-size: 1.45rem; text-decoration: none; }
+  .mobile-menu a span { color: var(--gold); font: 700 .7rem 'DM Sans', sans-serif; }
+  @media (max-width: 760px) { .desktop-nav { display: none; } .menu-toggle { display: inline-grid; } }
+</style>
+
+<script>
+  const setupHeader = () => {
+    const header = document.querySelector<HTMLElement>('[data-header]');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+    const menu = document.querySelector<HTMLElement>('[data-mobile-menu]');
+    if (!header || !toggle || !menu || toggle.dataset.ready) return;
+    toggle.dataset.ready = 'true';
+    const updateHeader = () => header.classList.toggle('scrolled', window.scrollY > 12);
+    updateHeader();
+    window.addEventListener('scroll', updateHeader, { passive: true });
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      menu.hidden = !open;
+    });
+  };
+  setupHeader();
+  document.addEventListener('astro:page-load', setupHeader);
+</script>

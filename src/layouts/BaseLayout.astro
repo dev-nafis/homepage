@@ -1,0 +1,97 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
+import { site } from '../data/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'music.song' | 'profile';
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title = site.title,
+  description = site.description,
+  image = '/social-card.svg',
+  type = 'website',
+  structuredData
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url);
+const fullTitle = title === site.title ? title : `${title} | ${site.name}`;
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0b0c" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="google" content="notranslate" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="Nafis Al-Muhsin recitations" href="/rss.xml" />
+    <title>{fullTitle}</title>
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(image, site.url)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, site.url)} />
+    <script is:inline>
+      (() => { document.documentElement.classList.add('js'); try { const preference = localStorage.getItem('nafis:theme') || 'dark'; const theme = preference === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : preference; document.documentElement.dataset.theme = theme; document.documentElement.dataset.themePreference = preference; } catch {} })();
+    </script>
+    {structuredData && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+    {plausibleDomain && <script defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>}
+    <ClientRouter fallback="swap" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <Header />
+    <main id="main-content"><slot /></main>
+    <Footer />
+    <AudioPlayer />
+    <script>
+      const themeQuery = matchMedia('(prefers-color-scheme: dark)');
+      const applyTheme = (preference: string) => {
+        const safePreference = ['light', 'dark', 'system'].includes(preference) ? preference : 'system';
+        const effective = safePreference === 'system' ? (themeQuery.matches ? 'dark' : 'light') : safePreference;
+        document.documentElement.dataset.theme = effective;
+        document.documentElement.dataset.themePreference = safePreference;
+        document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+          button.setAttribute('aria-label', `Colour theme: ${safePreference}. Activate to choose the next theme.`);
+          button.title = `Colour theme: ${safePreference}`;
+        });
+      };
+      function setupGlobalUI() {
+        document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+          if (button.dataset.ready) return;
+          button.dataset.ready = 'true';
+          button.addEventListener('click', () => {
+            const current = document.documentElement.dataset.themePreference || 'system';
+            const next = current === 'dark' ? 'light' : current === 'light' ? 'system' : 'dark';
+            localStorage.setItem('nafis:theme', next);
+            applyTheme(next);
+          });
+        });
+        applyTheme(document.documentElement.dataset.themePreference || localStorage.getItem('nafis:theme') || 'dark');
+        const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')), { threshold: .12 });
+        document.querySelectorAll<HTMLElement>('.reveal:not(.is-visible)').forEach((element) => observer.observe(element));
+      }
+      themeQuery.addEventListener('change', () => { if ((document.documentElement.dataset.themePreference || 'system') === 'system') applyTheme('system'); });
+      setupGlobalUI();
+      document.addEventListener('astro:page-load', setupGlobalUI);
+    </script>
+  </body>
+</html>
