@@ -28,14 +28,14 @@ Normal builds are fully static and never call the Quran Foundation API. The chec
 
 Copy `.env.example` to `.env` for local work. Do not commit `.env` files.
 
-- `PUBLIC_FORMSPREE_ENDPOINT`: complete Formspree form URL. CI intentionally fails without it.
+- `PUBLIC_FORMSPREE_ENDPOINT`: optional complete Formspree form URL. Until it is configured, the contact form remains visibly disabled and visitors are directed to social channels.
 - `PUBLIC_PLAUSIBLE_DOMAIN`: Plausible domain, normally `nafisalmuhsin.com`.
 - `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_TRANSLATION_ID`: server-side sync credentials only; never exposed to browser code.
 - `QF_ENV`: optional `production` (default) or `prelive`.
 - `YOUTUBE_PLAYLIST_ID`: the public playlist used by the live privacy-enhanced playlist player. It defaults to Nafis's Popular Videos playlist.
 - `YOUTUBE_MAX_VIDEOS`: optional synchronization limit, defaulting to 12.
 
-In GitHub, add the Formspree URL as an Actions secret named `PUBLIC_FORMSPREE_ENDPOINT`. Add `PUBLIC_PLAUSIBLE_DOMAIN` as a repository variable. The playlist ID is checked into the deployment workflow.
+When you are ready to enable contact submissions, add the Formspree URL as an Actions secret named `PUBLIC_FORMSPREE_ENDPOINT` and set `REQUIRE_FORMSPREE=true` in the deployment environment. Add `PUBLIC_PLAUSIBLE_DOMAIN` as a repository variable when analytics is ready. The playlist ID is checked into the deployment workflow.
 
 ## Content workflow
 
