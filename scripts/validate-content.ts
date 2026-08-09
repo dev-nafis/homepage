@@ -59,7 +59,7 @@ publicFiles.forEach((extension) => {
   if (existsSync(resolve(root, `public/site${extension}`))) fail(`Forbidden ${extension} artifact exists in public/.`);
 });
 
-if (process.env.CI === 'true' && !process.env.PUBLIC_FORMSPREE_ENDPOINT) fail('PUBLIC_FORMSPREE_ENDPOINT is required for production CI builds.');
+if (process.env.REQUIRE_FORMSPREE === 'true' && !process.env.PUBLIC_FORMSPREE_ENDPOINT) fail('PUBLIC_FORMSPREE_ENDPOINT is required when contact submissions are enabled.');
 warnings.forEach((warning) => console.warn(`Warning: ${warning}`));
 if (failures.length) {
   failures.forEach((failure) => console.error(`Error: ${failure}`));
