@@ -1,0 +1,30 @@
+{
+  "name": "nafis-almuhsin-homepage",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "npm run validate && astro build",
+    "build:newsite": "npm run validate && tsx scripts/build-newsite.ts",
+    "preview": "astro preview",
+    "validate": "tsx scripts/validate-content.ts",
+    "sync:quran": "tsx scripts/sync-quran.ts",
+    "sync:youtube": "tsx scripts/sync-youtube.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.15",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.1.4"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

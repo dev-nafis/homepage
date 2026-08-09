@@ -1,0 +1,210 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from './Icon.astro';
+import { chapters, slugifyChapter } from '../lib/quran';
+import { withBase } from '../lib/route';
+
+const entries = await getCollection('recitations');
+const playlist = entries
+  .map((entry) => {
+    const chapter = chapters.find((item) => item.id === entry.data.surahId)!;
+    return { audio: withBase(entry.data.audio), title: entry.data.title, surah: entry.data.surahId, url: withBase(`/quran/${slugifyChapter(chapter)}/`), cues: entry.data.cues };
+  })
+  .sort((a, b) => a.surah - b.surah);
+---
+<aside class="audio-player" aria-label="Audio player" data-audio-player data-playlist={JSON.stringify(playlist)} transition:persist="global-audio-player" hidden>
+  <audio preload="metadata" data-audio></audio>
+  <div class="player-inner">
+    <div class="track-summary">
+      <div class="track-art" aria-hidden="true"><span data-track-number>—</span></div>
+      <div class="track-copy"><span>Now playing</span><a href={withBase('/quran/')} data-track-link><strong data-track-title>Select a recitation</strong></a></div>
+    </div>
+    <div class="primary-controls">
+      <button class="player-icon optional-control" type="button" aria-label="Back 10 seconds" data-skip="-10"><Icon name="skipBack" /></button>
+      <button class="play-toggle" type="button" aria-label="Play" data-player-play><Icon name="play" size={22} /></button>
+      <button class="player-icon optional-control" type="button" aria-label="Forward 10 seconds" data-skip="10"><Icon name="skipForward" /></button>
+    </div>
+    <div class="timeline">
+      <span data-current-time>0:00</span>
+      <input type="range" min="0" max="100" value="0" step="0.1" aria-label="Audio progress" data-progress />
+      <span data-duration>0:00</span>
+    </div>
+    <div class="secondary-controls">
+      <label class="volume optional-control"><Icon name="volume" size={17} /><span class="sr-only">Volume</span><input type="range" min="0" max="1" value="1" step="0.05" aria-label="Volume" data-volume /></label>
+      <label class="speed"><span class="sr-only">Playback speed</span><select data-speed aria-label="Playback speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select></label>
+      <button class="mode-control" type="button" data-play-mode data-mode="continuous" aria-label="Playback mode: continuous Surah order" title="Playback mode: continuous Surah order"><Icon name="repeat" size={17} /><span data-mode-label>Continue</span></button>
+      <button class="player-icon optional-control" type="button" aria-label="Share recitation" data-player-share><Icon name="share" /></button>
+      <a class="player-icon optional-control" href="#" aria-label="Download recitation" data-player-download download><Icon name="download" /></a>
+      <button class="player-icon favourite-control" type="button" aria-label="Favourite recitation" aria-pressed="false" data-player-favourite><Icon name="heart" /></button>
+    </div>
+  </div>
+</aside>
+
+<style>
+  .audio-player { position: fixed; inset: auto .75rem .75rem; z-index: 120; min-height: var(--player-height); border: 1px solid color-mix(in srgb, var(--gold) 45%, var(--line)); border-radius: 1.15rem; color: var(--on-strong); background: color-mix(in srgb, var(--surface-strong) 94%, transparent); box-shadow: 0 20px 60px rgba(0,0,0,.35); backdrop-filter: blur(20px); }
+  .player-inner { display: grid; min-height: var(--player-height); grid-template-columns: minmax(170px,1fr) auto minmax(220px,1.65fr) auto; align-items: center; gap: 1rem; width: min(calc(100% - 1rem), 1400px); margin: auto; padding: .55rem 1rem; }
+  .track-summary { display: flex; min-width: 0; align-items: center; gap: .75rem; }
+  .track-art { display: grid; width: 48px; height: 48px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(255,255,255,.22); border-radius: .75rem; color: var(--surface-strong); background: linear-gradient(145deg,#ebd39a,var(--emerald)); font: 700 .75rem 'DM Sans',sans-serif; }
+  .track-copy { min-width: 0; line-height: 1.2; }
+  .track-copy span { display: block; margin-bottom: .22rem; color: var(--on-strong-soft); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; }
+  .track-copy a { display: block; overflow: hidden; color: var(--on-strong); text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+  .primary-controls, .secondary-controls { display: flex; align-items: center; gap: .35rem; }
+  .player-icon, .play-toggle { display: grid; width: 40px; height: 40px; padding: 0; place-items: center; border: 0; border-radius: 50%; color: var(--on-strong); background: transparent; text-decoration: none; cursor: pointer; }
+  .player-icon:hover { background: rgba(255,255,255,.1); }
+  .play-toggle { color: var(--surface-strong); background: #f1d99e; }
+  .play-toggle:hover { transform: scale(1.04); }
+  [data-player-favourite][aria-pressed='true'] { color: #f1d99e; }
+  .timeline { display: grid; grid-template-columns: 2.7rem 1fr 2.7rem; align-items: center; gap: .65rem; color: var(--on-strong-soft); font-size: .7rem; font-variant-numeric: tabular-nums; }
+  input[type='range'] { width: 100%; height: 4px; accent-color: #efd696; cursor: pointer; }
+  .volume { display: flex; width: 82px; align-items: center; gap: .35rem; color: var(--on-strong-soft); }
+  .volume input { min-width: 0; }
+  .speed select { min-height: 36px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; color: var(--on-strong); background: var(--surface-control); font-size: .76rem; }
+  .mode-control { display: inline-flex; min-width: 76px; min-height: 36px; align-items: center; justify-content: center; gap: .35rem; padding: .35rem .55rem; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; color: var(--on-strong); background: var(--surface-control); font-size: .7rem; cursor: pointer; }
+  .mode-control[data-mode='continuous'], .mode-control[data-mode='repeat'] { color: #f1d99e; border-color: rgba(241,217,158,.45); }
+  @media (max-width: 940px) { .player-inner { grid-template-columns: minmax(0,1fr) auto auto; } .timeline { grid-column: 1 / -1; grid-row: 2; } .optional-control { display: none; } }
+  @media (max-width: 520px) { .audio-player { inset: auto .4rem .4rem; } .player-inner { gap: .45rem .65rem; padding: .65rem .75rem; } .track-art { width: 42px; height: 42px; } .track-copy strong { font-size: .88rem; } .secondary-controls { justify-content: end; } .mode-control { min-width: 40px; width: 40px; padding: 0; } .mode-control span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); } .favourite-control { display: none; } }
+</style>
+
+<script>
+  type TrackPayload = { audio: string; title: string; surah: number; url: string; cues: { verse: number; start: number; end?: number }[] };
+  type PlaybackMode = 'once' | 'continuous' | 'repeat';
+  type PlayerState = { track?: TrackPayload; time?: number; rate?: number; volume?: number; mode?: PlaybackMode; favourites?: number[]; recent?: number[] };
+
+  const storageKey = 'nafis:quran-player:v1';
+  const parseState = (): PlayerState => { try { return JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch { return {}; } };
+  const saveState = (patch: Partial<PlayerState>) => localStorage.setItem(storageKey, JSON.stringify({ ...parseState(), ...patch }));
+  const formatTime = (seconds: number) => Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${Math.floor(seconds % 60).toString().padStart(2, '0')}` : '0:00';
+
+  function setupPlayer() {
+    const root = document.querySelector<HTMLElement>('[data-audio-player]');
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = 'true';
+    const audio = root.querySelector<HTMLAudioElement>('[data-audio]')!;
+    const playButton = root.querySelector<HTMLButtonElement>('[data-player-play]')!;
+    const progress = root.querySelector<HTMLInputElement>('[data-progress]')!;
+    const title = root.querySelector<HTMLElement>('[data-track-title]')!;
+    const number = root.querySelector<HTMLElement>('[data-track-number]')!;
+    const link = root.querySelector<HTMLAnchorElement>('[data-track-link]')!;
+    const current = root.querySelector<HTMLElement>('[data-current-time]')!;
+    const duration = root.querySelector<HTMLElement>('[data-duration]')!;
+    const speed = root.querySelector<HTMLSelectElement>('[data-speed]')!;
+    const volume = root.querySelector<HTMLInputElement>('[data-volume]')!;
+    const favourite = root.querySelector<HTMLButtonElement>('[data-player-favourite]')!;
+    const download = root.querySelector<HTMLAnchorElement>('[data-player-download]')!;
+    const modeButton = root.querySelector<HTMLButtonElement>('[data-play-mode]')!;
+    const modeLabel = root.querySelector<HTMLElement>('[data-mode-label]')!;
+    const playlist = JSON.parse(root.dataset.playlist || '[]') as TrackPayload[];
+    let activeTrack: TrackPayload | undefined;
+    let activeVerse = 0;
+    let playbackMode: PlaybackMode = 'continuous';
+    let pendingSeek = 0;
+    let lastSavedSecond = -1;
+
+    const updateIcon = () => {
+      playButton.innerHTML = audio.paused ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' : '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>';
+      playButton.setAttribute('aria-label', audio.paused ? 'Play' : 'Pause');
+    };
+    const updateFavourite = () => favourite.setAttribute('aria-pressed', String(!!activeTrack && (parseState().favourites || []).includes(activeTrack.surah)));
+    const updateMode = (mode: PlaybackMode) => {
+      playbackMode = mode;
+      const names = { once: 'Play once', continuous: 'Continuous · Surah order', repeat: 'Repeat this Surah' };
+      const shortNames = { once: 'Once', continuous: 'Continue', repeat: 'Repeat' };
+      modeButton.dataset.mode = mode;
+      modeButton.setAttribute('aria-label', `Playback mode: ${names[mode]}. Activate to change mode.`);
+      modeButton.title = `Playback mode: ${names[mode]}`;
+      modeLabel.textContent = shortNames[mode];
+    };
+    const adjacentTrack = (direction: 1 | -1) => {
+      if (!playlist.length) return undefined;
+      const found = playlist.findIndex((track) => track.surah === activeTrack?.surah);
+      const index = found < 0 ? (direction === 1 ? -1 : 0) : found;
+      return playlist[(index + direction + playlist.length) % playlist.length];
+    };
+    const announceVerse = () => {
+      if (!activeTrack?.cues.length) return;
+      const cue = [...activeTrack.cues].reverse().find((item) => audio.currentTime >= item.start);
+      if (cue && cue.verse !== activeVerse) { activeVerse = cue.verse; document.dispatchEvent(new CustomEvent('nafis:versechange', { detail: { surah: activeTrack.surah, verse: cue.verse } })); }
+    };
+    const setTrack = (track: TrackPayload, startAt = 0, autoplay = true) => {
+      const changed = activeTrack?.audio !== track.audio;
+      activeTrack = track;
+      if (changed) { pendingSeek = startAt; activeVerse = 0; audio.src = track.audio; }
+      else if (startAt) audio.currentTime = startAt;
+      title.textContent = track.title;
+      number.textContent = String(track.surah).padStart(3, '0');
+      link.href = track.url;
+      download.href = track.audio;
+      root.hidden = false;
+      document.body.classList.add('has-player');
+      const state = parseState();
+      const recent = [track.surah, ...(state.recent || []).filter((id) => id !== track.surah)].slice(0, 6);
+      saveState({ track, time: startAt, recent });
+      updateFavourite();
+      if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: track.title, artist: 'Nafis Al-Muhsin', album: 'Qur’an Recitations' });
+      if (autoplay) audio.play().catch(() => undefined);
+    };
+
+    audio.addEventListener('loadedmetadata', () => { if (pendingSeek) { audio.currentTime = Math.min(pendingSeek, audio.duration); pendingSeek = 0; } duration.textContent = `-${formatTime(Math.max(0, audio.duration - audio.currentTime))}`; });
+    audio.addEventListener('timeupdate', () => {
+      current.textContent = formatTime(audio.currentTime);
+      duration.textContent = `-${formatTime(Math.max(0, audio.duration - audio.currentTime))}`;
+      progress.value = audio.duration ? String((audio.currentTime / audio.duration) * 100) : '0';
+      announceVerse();
+      const wholeSecond = Math.floor(audio.currentTime);
+      if (wholeSecond !== lastSavedSecond && wholeSecond % 5 === 0) { lastSavedSecond = wholeSecond; saveState({ time: audio.currentTime }); }
+    });
+    audio.addEventListener('play', () => { updateIcon(); (window as any).plausible?.('Recitation Play', { props: { surah: String(activeTrack?.surah || '') } }); });
+    audio.addEventListener('pause', updateIcon);
+    audio.addEventListener('ended', () => {
+      (window as any).plausible?.('Recitation Complete', { props: { surah: String(activeTrack?.surah || '') } });
+      if (playbackMode === 'repeat') { audio.currentTime = 0; audio.play().catch(() => undefined); return; }
+      if (playbackMode === 'continuous') { const next = adjacentTrack(1); if (next) { setTrack(next, 0, true); return; } }
+      updateIcon();
+    });
+    playButton.addEventListener('click', () => audio.paused ? audio.play() : audio.pause());
+    progress.addEventListener('input', () => { if (audio.duration) audio.currentTime = (Number(progress.value) / 100) * audio.duration; });
+    root.querySelectorAll<HTMLElement>('[data-skip]').forEach((button) => button.addEventListener('click', () => { audio.currentTime = Math.max(0, Math.min(audio.duration || Infinity, audio.currentTime + Number(button.dataset.skip))); }));
+    speed.addEventListener('change', () => { audio.playbackRate = Number(speed.value); saveState({ rate: audio.playbackRate }); });
+    volume.addEventListener('input', () => { audio.volume = Number(volume.value); saveState({ volume: audio.volume }); });
+    modeButton.addEventListener('click', () => { const next: PlaybackMode = playbackMode === 'once' ? 'continuous' : playbackMode === 'continuous' ? 'repeat' : 'once'; updateMode(next); saveState({ mode: next }); (window as any).plausible?.('Playback Mode', { props: { mode: next } }); });
+    favourite.addEventListener('click', () => {
+      if (!activeTrack) return;
+      const state = parseState(); const favourites = new Set(state.favourites || []);
+      favourites.has(activeTrack.surah) ? favourites.delete(activeTrack.surah) : favourites.add(activeTrack.surah);
+      saveState({ favourites: [...favourites] }); updateFavourite(); document.dispatchEvent(new CustomEvent('nafis:favouriteschange'));
+    });
+    root.querySelector('[data-player-share]')?.addEventListener('click', async () => {
+      if (!activeTrack) return;
+      const share = { title: activeTrack.title, text: `Listen to ${activeTrack.title} recited by Nafis Al-Muhsin`, url: new URL(activeTrack.url, location.origin).href };
+      if (navigator.share) await navigator.share(share).catch(() => undefined); else await navigator.clipboard.writeText(share.url);
+      (window as any).plausible?.('Recitation Share', { props: { surah: String(activeTrack.surah) } });
+    });
+    document.addEventListener('click', (event) => {
+      const target = (event.target as Element).closest<HTMLElement>('[data-play-track]');
+      if (target) {
+        event.preventDefault();
+        const payload: TrackPayload = { audio: target.dataset.audio!, title: target.dataset.title!, surah: Number(target.dataset.surah), url: target.dataset.url!, cues: JSON.parse(target.dataset.cues || '[]') };
+        if (activeTrack?.audio === payload.audio) audio.paused ? audio.play() : audio.pause(); else setTrack(payload);
+      }
+      const verse = (event.target as Element).closest<HTMLElement>('[data-verse-start]');
+      if (verse && activeTrack?.surah === Number(verse.dataset.surah)) { audio.currentTime = Number(verse.dataset.verseStart); audio.play(); }
+    });
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => audio.play());
+      navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+      navigator.mediaSession.setActionHandler('seekbackward', () => audio.currentTime = Math.max(0, audio.currentTime - 10));
+      navigator.mediaSession.setActionHandler('seekforward', () => audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + 10));
+      navigator.mediaSession.setActionHandler('seekto', (details) => { if (typeof details.seekTime === 'number') audio.currentTime = Math.min(audio.duration || Infinity, Math.max(0, details.seekTime)); });
+      navigator.mediaSession.setActionHandler('nexttrack', () => { const next = adjacentTrack(1); if (next) setTrack(next); });
+      navigator.mediaSession.setActionHandler('previoustrack', () => { const previous = adjacentTrack(-1); if (previous) setTrack(previous); });
+    }
+    const state = parseState();
+    if (state.rate) { audio.playbackRate = state.rate; speed.value = String(state.rate); }
+    if (typeof state.volume === 'number') { audio.volume = Math.min(1, Math.max(0, state.volume)); volume.value = String(audio.volume); }
+    updateMode(state.mode || 'continuous');
+    if (state.track) setTrack(state.track, state.time || 0, false);
+    updateIcon();
+  }
+  setupPlayer();
+  document.addEventListener('astro:page-load', setupPlayer);
+</script>

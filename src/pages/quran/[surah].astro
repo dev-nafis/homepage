@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { chapters, slugifyChapter, formatDuration } from '../../lib/quran';
+import source from '../../data/quran-source.json';
+import { withBase } from '../../lib/route';
+import type { QuranChapter, Recitation } from '../../types';
+
+export function getStaticPaths() {
+  return chapters.map((chapter) => ({ params: { surah: slugifyChapter(chapter) }, props: { chapter } }));
+}
+
+interface Props { chapter: QuranChapter; }
+const { chapter } = Astro.props;
+const recitationEntries = await getCollection('recitations');
+const entry = recitationEntries.find((item) => item.data.surahId === chapter.id);
+const recitation = entry ? ({ id: entry.id, ...entry.data, publishedAt: entry.data.publishedAt.toISOString() } as Recitation) : undefined;
+const cues = new Map(recitation?.cues.map((cue) => [cue.verse, cue]) ?? []);
+const index = chapters.findIndex((item) => item.id === chapter.id);
+const previous = index > 0 ? chapters[index - 1] : undefined;
+const next = index < chapters.length - 1 ? chapters[index + 1] : undefined;
+const pageUrl = withBase(`/quran/${slugifyChapter(chapter)}/`);
+const structuredData = [
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://nafisalmuhsin.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Qur’an', item: 'https://nafisalmuhsin.com/newsite/quran/' },
+    { '@type': 'ListItem', position: 3, name: chapter.transliteration, item: `https://nafisalmuhsin.com${pageUrl}` }
+  ]},
+  ...(recitation ? [{ '@context': 'https://schema.org', '@type': 'AudioObject', name: recitation.title, contentUrl: `https://nafisalmuhsin.com${recitation.audio}`, duration: `PT${Math.round(recitation.duration)}S`, creator: { '@type': 'Person', name: 'Nafis Al-Muhsin' } }] : [])
+];
+---
+<BaseLayout title={`Surah ${chapter.transliteration}`} description={`Read Surah ${chapter.transliteration} (${chapter.translation}) in Arabic with Saheeh International English translation${recitation ? ' and listen to Nafis Al-Muhsin’s recitation' : ''}.`} type={recitation ? 'music.song' : 'article'} structuredData={structuredData}>
+  <header class="surah-hero">
+    <div class="pattern"></div>
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={withBase('/')}>Home</a><span>/</span><a href={withBase('/quran/')}>Qur’an</a><span>/</span><span>{chapter.transliteration}</span></nav>
+      <div class="surah-heading reveal">
+        <div><p class="eyebrow">Surah {chapter.id} · {chapter.type === 'meccan' ? 'Makki' : 'Madani'}</p><h1>{chapter.transliteration}</h1><p class="lead">{chapter.translation} · {chapter.total_verses} ayat</p></div>
+        <div class="surah-calligraphy" lang="ar" dir="rtl" translate="no">{chapter.name}</div>
+      </div>
+      {recitation ? (
+        <div class="featured-audio card reveal">
+          <div class="audio-symbol"><span></span><span></span><span></span><span></span><span></span></div>
+          <div><small>Original recitation by Nafis Al‑Muhsin</small><strong>{recitation.title}</strong><span>{formatDuration(recitation.duration)} · Full Surah</span></div>
+          <button class="button" type="button" data-play-track data-audio={withBase(recitation.audio)} data-title={recitation.title} data-surah={recitation.surahId} data-url={pageUrl} data-cues={JSON.stringify(recitation.cues)}><Icon name="play" /> Play recitation</button>
+          {recitation.downloadable && <a class="icon-button" href={withBase(recitation.audio)} download aria-label={`Download ${recitation.title}`}><Icon name="download" /></a>}
+        </div>
+      ) : (
+        <div class="not-recorded card reveal"><span class="audio-symbol quiet"><span></span><span></span><span></span></span><div><strong>Nafis recording not yet available</strong><p>Read and reflect now. Original audio will appear here as the recitation library grows.</p></div></div>
+      )}
+    </div>
+  </header>
+
+  <section class="reader-section section-sm" translate="no">
+    <div class="narrow reader-controls reveal">
+      <div><p class="eyebrow">Arabic & English meaning</p><p class="muted">Select an ayah to copy its link{recitation?.cues.length ? ' or play from that verse' : ''}.</p></div>
+      <button class="button secondary small" type="button" data-reader-size aria-label="Increase Arabic text size">Text size <span>A+</span></button>
+    </div>
+    <div class="narrow verses" data-verses data-surah={chapter.id}>
+      {chapter.verses.map((verse) => {
+        const cue = cues.get(verse.id);
+        return <article id={`ayah-${verse.id}`} class="verse-card-reader reveal" data-verse={verse.id}>
+          <div class="verse-top"><span class="ayah-number">{chapter.id}:{verse.id}</span><div class="verse-actions">{cue && <button type="button" aria-label={`Play from ayah ${verse.id}`} data-verse-start={cue.start} data-surah={chapter.id}><Icon name="play" size={15} /></button>}<button type="button" aria-label={`Share ayah ${verse.id}`} data-share-verse data-verse-url={`${pageUrl}#ayah-${verse.id}`} data-verse-label={`${chapter.transliteration} ${chapter.id}:${verse.id}`}><Icon name="share" size={16} /></button></div></div>
+          <p class="arabic-text" lang="ar" dir="rtl" translate="no">{verse.text}<span class="ornate-number">﴿{verse.id}﴾</span></p>
+          <p class="translation-text" lang="en" translate="no">{verse.translation}</p>
+        </article>;
+      })}
+    </div>
+    <div class="narrow translation-credit"><strong>Translation</strong><p>{source.translation} by {source.translator}. Arabic text sourced from {source.arabicSource}. Dataset {source.provider} v{source.version}, {source.license}.</p></div>
+  </section>
+
+  <nav class="chapter-nav container" aria-label="Adjacent Surahs">
+    {previous ? <a href={withBase(`/quran/${slugifyChapter(previous)}/`)}><Icon name="back" /><span><small>Previous Surah</small><strong>{previous.transliteration}</strong></span></a> : <span></span>}
+    {next && <a class="next" href={withBase(`/quran/${slugifyChapter(next)}/`)}><span><small>Next Surah</small><strong>{next.transliteration}</strong></span><Icon name="arrow" /></a>}
+  </nav>
+</BaseLayout>
+
+<style>
+  .surah-hero { position: relative; overflow: hidden; padding: 2rem 0 clamp(3rem,7vw,6rem); background: var(--teal-soft); }
+  .surah-hero .pattern { color: var(--emerald); opacity: .045; }
+  .breadcrumbs { position: relative; display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: clamp(3rem,7vw,6rem); color: var(--ink-soft); font-size: .78rem; }
+  .breadcrumbs a { text-decoration: none; }
+  .surah-heading { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2rem; }
+  .surah-heading h1 { margin-bottom: .5rem; }
+  .surah-calligraphy { min-width: 280px; color: var(--emerald); font: 700 clamp(5rem,12vw,10rem) 'Noto Naskh Arabic',serif; line-height: .8; opacity: .82; }
+  .featured-audio, .not-recorded { position: relative; display: flex; align-items: center; gap: 1rem; margin-top: 3rem; padding: 1rem; }
+  .featured-audio > div:nth-child(2) { min-width: 0; margin-right: auto; }
+  .featured-audio small, .featured-audio strong, .featured-audio div > span { display: block; }
+  .featured-audio small { color: var(--emerald); font-size: .67rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .featured-audio strong { margin-block: .15rem; font-family: 'Playfair Display',serif; font-size: 1.25rem; }
+  .featured-audio div > span { color: var(--ink-soft); font-size: .75rem; }
+  .audio-symbol { display: flex; width: 54px; height: 54px; flex: 0 0 auto; align-items: center; justify-content: center; gap: 3px; border-radius: 50%; color: var(--accent-ink); background: var(--emerald); }
+  .audio-symbol span { width: 3px; height: 12px; border-radius: 3px; background: currentColor; animation: wave 1.2s ease-in-out infinite; }
+  .audio-symbol span:nth-child(2),.audio-symbol span:nth-child(4) { height: 24px; animation-delay: -.3s; }.audio-symbol span:nth-child(3) { height: 34px; animation-delay: -.6s; }
+  .audio-symbol.quiet { color: var(--ink-soft); background: var(--paper-muted); }
+  .not-recorded p { margin: .2rem 0 0; color: var(--ink-soft); }
+  @keyframes wave { 50% { transform: scaleY(.45); } }
+  .reader-section { background: var(--paper-raised); }
+  .reader-controls { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--line); }
+  .reader-controls p { margin-bottom: 0; }
+  .verses { --arabic-size: 2.1rem; }
+  .verse-card-reader { position: relative; padding: clamp(1.5rem,4vw,2.5rem) 0; border-bottom: 1px solid var(--line); scroll-margin-top: calc(var(--header-height) + 1rem); transition: background 300ms ease; }
+  .verse-card-reader.is-active { margin-inline: -1.5rem; padding-inline: 1.5rem; border-radius: var(--radius); background: var(--teal-soft); }
+  .verse-top { display: flex; align-items: center; justify-content: space-between; }
+  .ayah-number { display: grid; min-width: 42px; height: 42px; padding-inline: .4rem; place-items: center; border: 1px solid var(--line); border-radius: 50% 50% 50% 16%; color: var(--emerald); background: var(--paper); font-size: .68rem; font-weight: 700; }
+  .verse-actions { display: flex; gap: .35rem; }
+  .verse-actions button { display: grid; width: 38px; height: 38px; padding: 0; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--ink-soft); background: var(--paper); cursor: pointer; }
+  .verse-actions button:hover { color: var(--emerald); border-color: var(--emerald); }
+  .arabic-text { margin: 1.5rem 0 1rem; color: var(--ink); font: 500 var(--arabic-size) 'Noto Naskh Arabic',serif; line-height: 2; text-align: right; }
+  .ornate-number { margin-inline-start: .5rem; color: var(--gold); font-size: .65em; white-space: nowrap; }
+  .translation-text { margin: 0; color: var(--ink-soft); font-size: 1.03rem; line-height: 1.8; }
+  .translation-credit { margin-top: 3rem; padding: 1rem 1.2rem; border-left: 3px solid var(--gold); background: var(--paper-muted); font-size: .78rem; }
+  .translation-credit p { margin: .2rem 0 0; color: var(--ink-soft); }
+  .chapter-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding-block: 3rem; }
+  .chapter-nav a { display: flex; align-items: center; gap: .8rem; padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper-raised); text-decoration: none; }
+  .chapter-nav .next { justify-content: end; text-align: right; }
+  .chapter-nav small, .chapter-nav strong { display: block; }.chapter-nav small { color: var(--ink-soft); font-size: .7rem; }.chapter-nav strong { font-family: 'Playfair Display',serif; font-size: 1.15rem; }
+  @media (max-width: 720px) { .surah-heading { grid-template-columns: 1fr; } .surah-calligraphy { min-width: 0; font-size: 5rem; } .featured-audio { display: grid; grid-template-columns: auto 1fr auto; } .featured-audio .button { grid-column: 1/-1; } .featured-audio > .icon-button { grid-column: 3; grid-row: 1; } .not-recorded { align-items: start; } .reader-controls { display: grid; } .chapter-nav { grid-template-columns: 1fr; } }
+  @media (max-width: 450px) { .featured-audio { grid-template-columns: auto 1fr; } .featured-audio > .icon-button { display: none; } .arabic-text { line-height: 1.8; } }
+</style>
+
+<script>
+  function setupReader() {
+    const verses = document.querySelector<HTMLElement>('[data-verses]');
+    if (!verses || verses.dataset.ready) return;
+    verses.dataset.ready = 'true';
+    let size = 2.1;
+    document.querySelector('[data-reader-size]')?.addEventListener('click', () => { size = size >= 2.9 ? 1.8 : size + .25; verses.style.setProperty('--arabic-size', `${size}rem`); });
+    document.addEventListener('nafis:versechange', ((event: CustomEvent) => {
+      if (event.detail.surah !== Number(verses.dataset.surah)) return;
+      verses.querySelectorAll('[data-verse]').forEach((element) => element.classList.toggle('is-active', (element as HTMLElement).dataset.verse === String(event.detail.verse)));
+      document.querySelector(`[data-verse="${event.detail.verse}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }) as EventListener);
+    verses.querySelectorAll<HTMLButtonElement>('[data-share-verse]').forEach((button) => button.addEventListener('click', async () => {
+      const url = new URL(button.dataset.verseUrl || '', location.origin).href;
+      const share = { title: button.dataset.verseLabel, text: `Read ${button.dataset.verseLabel}`, url };
+      if (navigator.share) await navigator.share(share).catch(() => undefined); else { await navigator.clipboard.writeText(url); button.setAttribute('aria-label', 'Verse link copied'); }
+      (window as any).plausible?.('Verse Share');
+    }));
+  }
+  setupReader();
+  document.addEventListener('astro:page-load', setupReader);
+</script>

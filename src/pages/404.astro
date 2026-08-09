@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { withBase } from '../lib/route';
+---
+<BaseLayout title="Page not found" description="The page you requested could not be found.">
+  <section class="not-found"><div class="pattern"></div><div class="narrow reveal"><span>404</span><p class="eyebrow">Page not found</p><h1>This path has gone quiet.</h1><p class="lead">The page may have moved, but the recitations are still close by.</p><div class="button-row"><a class="button" href={withBase('/quran/')}>Explore the Qur’an <Icon name="arrow" /></a><a class="button secondary" href={withBase('/')}>Return home</a></div></div></section>
+</BaseLayout>
+
+<style>
+  .not-found { position: relative; display: grid; min-height: 70svh; place-items: center; overflow: hidden; padding-block: 5rem; text-align: center; background: var(--teal-soft); }
+  .not-found .narrow { position: relative; }.not-found .narrow > span { display: block; color: var(--gold); font: 700 clamp(5rem,18vw,11rem) 'Playfair Display',serif; line-height: .8; opacity: .65; }.not-found .eyebrow { justify-content: center; margin-top: 2rem; }.not-found h1 { font-size: clamp(2.6rem,7vw,5rem); }.not-found .lead { margin-inline: auto; }.button-row { justify-content: center; }
+</style>

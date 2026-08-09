@@ -1,0 +1,38 @@
+[
+  {
+    "id": "al-alaq",
+    "surahId": 96,
+    "title": "Surah Al-Alaq",
+    "titleArabic": "العلق",
+    "audio": "/media/audio/surah-alaq.mp3",
+    "duration": 96,
+    "publishedAt": "2023-07-01",
+    "featured": true,
+    "downloadable": true,
+    "cues": []
+  },
+  {
+    "id": "al-balad",
+    "surahId": 90,
+    "title": "Surah Al-Balad",
+    "titleArabic": "البلد",
+    "audio": "/media/audio/surah-balad.mp3",
+    "duration": 126,
+    "publishedAt": "2023-07-02",
+    "featured": false,
+    "downloadable": true,
+    "cues": []
+  },
+  {
+    "id": "al-fajr",
+    "surahId": 89,
+    "title": "Surah Al-Fajr",
+    "titleArabic": "الفجر",
+    "audio": "/media/audio/surah-fajr.mp3",
+    "duration": 184,
+    "publishedAt": "2023-07-03",
+    "featured": false,
+    "downloadable": true,
+    "cues": []
+  }
+]

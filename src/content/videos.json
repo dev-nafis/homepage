@@ -1,0 +1,24 @@
+[
+  {
+    "id": "visual-quran-translation",
+    "title": "Visual Qur’an with Translation",
+    "platform": "youtube",
+    "embedId": "FeMHr6EHBCk",
+    "url": "https://www.youtube.com/watch?v=FeMHr6EHBCk",
+    "thumbnail": "https://i.ytimg.com/vi/FeMHr6EHBCk/maxresdefault.jpg",
+    "category": "Visual Qur’an",
+    "publishedAt": "2023-07-01",
+    "featured": true
+  },
+  {
+    "id": "surah-al-ahzab-35",
+    "title": "Surah Al-Ahzab — Ayah 35",
+    "platform": "youtube",
+    "embedId": "CDSGZMl46hI",
+    "url": "https://www.youtube.com/watch?v=CDSGZMl46hI",
+    "thumbnail": "https://i.ytimg.com/vi/CDSGZMl46hI/maxresdefault.jpg",
+    "category": "Qur’an Recitation",
+    "publishedAt": "2023-02-16",
+    "featured": true
+  }
+]

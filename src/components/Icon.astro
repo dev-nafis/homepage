@@ -1,0 +1,31 @@
+---
+interface Props { name: string; size?: number; label?: string; }
+const { name, size = 20, label } = Astro.props;
+const paths: Record<string, string> = {
+  play: 'M8 5v14l11-7z',
+  pause: 'M7 5h4v14H7zm6 0h4v14h-4z',
+  sun: 'M12 4V2m0 20v-2m8-8h2M2 12h2m13.66-5.66 1.42-1.42M4.92 19.08l1.42-1.42m0-11.32L4.92 4.92m14.16 14.16-1.42-1.42M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z',
+  moon: 'M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2z',
+  menu: 'M4 7h16M4 12h16M4 17h16',
+  close: 'M6 6l12 12M18 6 6 18',
+  arrow: 'M5 12h14m-5-5 5 5-5 5',
+  back: 'M19 12H5m5 5-5-5 5-5',
+  search: 'm21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0z',
+  heart: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z',
+  share: 'M18 8a3 3 0 1 0-2.83-4A3 3 0 0 0 15 5c0 .2.02.4.06.58L8.9 9.13A3 3 0 0 0 4 11.5a3 3 0 0 0 4.9 2.37l6.16 3.55c-.04.19-.06.38-.06.58a3 3 0 1 0 1.1-2.32l-6.16-3.55c.04-.2.06-.41.06-.63s-.02-.43-.07-.63l6.17-3.55A3 3 0 0 0 18 8z',
+  download: 'M12 3v12m-5-5 5 5 5-5M5 21h14',
+  volume: 'M11 5 6 9H3v6h3l5 4zm4.5 3.5a5 5 0 0 1 0 7M18 6a8 8 0 0 1 0 12',
+  skipBack: 'M19 20 9 12l10-8v16zM5 5v14',
+  skipForward: 'm5 4 10 8-10 8V4zm14 1v14',
+  repeat: 'm17 1 4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4m14-2v2a4 4 0 0 1-4 4H3',
+  external: 'M14 4h6v6m0-6-9 9M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5',
+  mail: 'M3 5h18v14H3zm0 1 9 7 9-7',
+  instagram: 'M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-1.5h.01',
+  youtube: 'M22 8.2a2.8 2.8 0 0 0-2-2C18.2 5.7 12 5.7 12 5.7s-6.2 0-8 .5a2.8 2.8 0 0 0-2 2A29 29 0 0 0 1.5 12 29 29 0 0 0 2 15.8a2.8 2.8 0 0 0 2 2c1.8.5 8 .5 8 .5s6.2 0 8-.5a2.8 2.8 0 0 0 2-2 29 29 0 0 0 .5-3.8 29 29 0 0 0-.5-3.8zM10 15V9l5 3z',
+  tiktok: 'M15 3c.3 2.6 1.8 4.2 4 4.5V11a8 8 0 0 1-4-1.2V16a6 6 0 1 1-5-5.9v3.6a2.5 2.5 0 1 0 1.5 2.3V3H15z',
+};
+---
+<svg width={size} height={size} viewBox="0 0 24 24" fill={['play','pause','youtube','tiktok'].includes(name) ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden={label ? undefined : 'true'} role={label ? 'img' : undefined}>
+  {label && <title>{label}</title>}
+  {name === 'spotify' ? <><path d="M4.5 8.2c4.8-1.5 10.4-.8 14.6 1.8" stroke-width="2.35" /><path d="M5.7 11.7c4-1.2 8.5-.6 12 1.5" stroke-width="2.15" /><path d="M7 15c3.1-.85 6.5-.35 9.25 1.25" stroke-width="2" /></> : <path d={paths[name] ?? paths.arrow} />}
+</svg>

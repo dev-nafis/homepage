@@ -1,0 +1,90 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import SurahCard from '../components/SurahCard.astro';
+import PlaylistEmbed from '../components/PlaylistEmbed.astro';
+import SocialDock from '../components/SocialDock.astro';
+import portrait from '../assets/nafis-portrait.jpeg';
+import { chapters, slugifyChapter } from '../lib/quran';
+import { withBase } from '../lib/route';
+import { site } from '../data/site';
+import type { Recitation } from '../types';
+
+const recitationEntries = await getCollection('recitations');
+const recitations = recitationEntries.map(({ id, data }) => ({ id, ...data, publishedAt: data.publishedAt.toISOString() })) as Recitation[];
+const featuredRecitation = recitations.find((item) => item.featured) ?? recitations[0];
+const featuredChapter = chapters.find((item) => item.id === featuredRecitation.surahId)!;
+const recordedChapters = recitations.map((recitation) => ({ chapter: chapters.find((chapter) => chapter.id === recitation.surahId)!, recitation }));
+const youtube = site.socials.find((social) => social.name === 'YouTube')!;
+const personSchema = {
+  '@context': 'https://schema.org', '@type': 'Person', name: site.name, url: site.url,
+  image: `${site.url}${withBase('/social-card.svg')}`, jobTitle: 'Qur’an Reciter', sameAs: site.socials.map((social) => social.url)
+};
+---
+<BaseLayout structuredData={personSchema}>
+  <section class="home-intro">
+    <aside class="follow-bar">
+      <div class="container">
+        <SocialDock heading="FOLLOW ME" description="New recitations and videos shared where you already listen.">
+          <Image slot="media" src={portrait} alt="Nafis Al-Muhsin" widths={[160,240]} sizes="(max-width: 560px) 80px, 112px" format="webp" loading="eager" />
+        </SocialDock>
+      </div>
+    </aside>
+    <div class="welcome-hero">
+      <div class="narrow welcome-grid">
+        <div class="welcome-copy">
+          <p class="eyebrow">Assalamu alaikum — welcome</p>
+          <h1>Thank you for listening.</h1>
+          <p class="welcome-message">I’m Nafis Al-Muhsin. I’m grateful you’re here—follow the journey, watch the latest videos, or take a quiet moment with a recitation.</p>
+          <button class="listen-link" type="button" data-play-track data-audio={withBase(featuredRecitation.audio)} data-title={featuredRecitation.title} data-surah={featuredRecitation.surahId} data-url={withBase(`/quran/${slugifyChapter(featuredChapter)}/`)} data-cues={JSON.stringify(featuredRecitation.cues)}><Icon name="play" size={17} /> Listen to the latest recitation</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="youtube-section section" aria-labelledby="popular-videos-heading">
+    <div class="container">
+      <div class="section-heading">
+        <div><p class="eyebrow">Popular videos</p><h2 id="popular-videos-heading">Watch, then come back to it.</h2><p class="section-summary">The most-viewed recitations, kept current from YouTube.</p></div>
+        <a class="button youtube-button" href={youtube.url} target="_blank" rel="noopener"><Icon name="youtube" /> Subscribe on YouTube</a>
+      </div>
+      <PlaylistEmbed playlistId="PLSw26XuZVejA" />
+      <div class="section-end"><a href={withBase('/videos/')}>See the complete video collection <Icon name="arrow" size={17} /></a></div>
+    </div>
+  </section>
+
+  <section class="recitations-section section" aria-labelledby="listen-heading">
+    <div class="container">
+      <div class="section-heading"><div><p class="eyebrow">Listen</p><h2 id="listen-heading">Make space for a Surah.</h2><p class="section-summary">Choose a recitation, or open the Qur’an library to read every Surah.</p></div><a class="button secondary" href={withBase('/quran/')}>Open Qur’an library <Icon name="arrow" /></a></div>
+      <div class="grid three">{recordedChapters.map(({ chapter, recitation }) => <SurahCard chapter={chapter} recitation={recitation} />)}</div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .follow-bar { padding-block: clamp(1.25rem,3vw,2rem); border-bottom: 1px solid var(--line); background: var(--paper-raised); }
+  .home-intro { background: var(--paper); }
+  .welcome-hero { padding-block: clamp(3rem,6vw,5rem); background: var(--paper); }
+  .welcome-grid { text-align: center; }
+  .welcome-copy { min-width: 0; }.welcome-copy .eyebrow { justify-content: center; }
+  .welcome-copy h1 { max-width: 10ch; margin-bottom: 1.1rem; font-size: clamp(3rem,5vw,4.9rem); }
+  .welcome-message { max-width: 56ch; margin-inline: auto; color: var(--ink-soft); font-size: clamp(1.08rem,1.8vw,1.25rem); }
+  .listen-link, .section-end a { display: inline-flex; min-height: 48px; align-items: center; gap: .5rem; margin-top: 1.25rem; padding: .65rem 0; border: 0; color: var(--emerald); background: transparent; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .youtube-section { border-top: 1px solid var(--line); background: var(--paper-raised); }
+  .section-summary { max-width: 58ch; margin: .8rem 0 0; color: var(--ink-soft); }
+  .youtube-button { color: #fff; background: #c51f1f; box-shadow: none; }
+  .youtube-button:hover { background: #a91919; }
+  .section-end { display: flex; justify-content: flex-end; margin-top: 1.4rem; }
+  .recitations-section { background: var(--paper); }
+  @media (max-width: 760px) { .section-heading { text-align: left; } }
+  @media (max-width: 600px) { .welcome-copy h1 { font-size: clamp(2.75rem,13vw,4rem); }.section-end { justify-content: flex-start; } }
+</style>
+
+<script>
+  document.addEventListener('click', (event) => {
+    const social = (event.target as Element).closest<HTMLElement>('[data-social-link]');
+    if (social) (window as any).plausible?.('Social Click', { props: { platform: social.dataset.socialLink } });
+  });
+</script>

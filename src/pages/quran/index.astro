@@ -1,0 +1,113 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import SurahCard from '../../components/SurahCard.astro';
+import { chapters } from '../../lib/quran';
+import { withBase } from '../../lib/route';
+import type { Recitation } from '../../types';
+
+const entries = await getCollection('recitations');
+const recitations = entries.map(({ id, data }) => ({ id, ...data, publishedAt: data.publishedAt.toISOString() })) as Recitation[];
+const bySurah = new Map(recitations.map((item) => [item.surahId, item]));
+---
+<BaseLayout title="Listen & Follow the Qur’an" description="Explore all 114 Surahs with Uthmani Arabic and an attributed English translation. Listen to original recitations by Nafis Al-Muhsin where available.">
+  <header class="page-hero quran-hero">
+    <div class="orb"></div><div class="pattern"></div>
+    <div class="container hero-inner reveal">
+      <p class="eyebrow">Listen · Read · Return</p>
+      <h1>Find a quiet moment with the Qur’an.</h1>
+      <p class="lead">All 114 Surahs, clear Arabic text, English meaning, and a growing collection of original recitations.</p>
+      <div class="library-stats"><span><strong>114</strong> Surahs</span><span><strong>6,236</strong> Ayat</span><span><strong>{recitations.length}</strong> Nafis recordings</span></div>
+    </div>
+  </header>
+
+  <section class="library section-sm">
+    <div class="container">
+      <div class="library-controls card reveal" role="search">
+        <label class="search-field"><Icon name="search" /><span class="sr-only">Search Surahs</span><input type="search" placeholder="Search by name, meaning, Arabic, or number…" autocomplete="off" data-surah-search /></label>
+        <div class="filter-tabs" role="group" aria-label="Filter Surahs">
+          <button class="active" type="button" data-filter="all">All</button>
+          <button type="button" data-filter="recorded">Recorded</button>
+          <button type="button" data-filter="favourites">Favourites</button>
+        </div>
+        <button class="button secondary small random-surah" type="button" data-random-surah>Surprise me <Icon name="arrow" size={16} /></button>
+      </div>
+      <div class="result-row"><p><strong data-result-count>{chapters.length}</strong> Surahs</p><p class="muted" data-empty-message hidden>No Surahs match that search. Try another name or number.</p></div>
+      <div class="surah-grid" data-surah-grid>
+        {chapters.map((chapter) => <SurahCard chapter={chapter} recitation={bySurah.get(chapter.id)} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="reader-note section-sm">
+    <div class="narrow reveal"><p class="eyebrow">Translation note</p><h2>Read with context and care.</h2><p class="lead">The English text is Saheeh International, presented as a translation of meaning. Qur’anic Arabic remains the primary text and is deliberately protected from automatic browser translation.</p><a class="button secondary" href={withBase('/privacy/#quran-data')}>About our Qur’an data <Icon name="arrow" /></a></div>
+  </section>
+</BaseLayout>
+
+<style>
+  .quran-hero { min-height: 610px; display: flex; align-items: center; }
+  .quran-hero .pattern { color: var(--emerald); }
+  .hero-inner { position: relative; }
+  .hero-inner h1 { max-width: 12ch; }
+  .library-stats { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+  .library-stats span { padding: .6rem .85rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); background: var(--paper-raised); font-size: .8rem; }
+  .library-stats strong { color: var(--emerald); }
+  .library { background: var(--paper-raised); }
+  .library-controls { position: sticky; top: calc(var(--header-height) + .75rem); z-index: 20; display: grid; grid-template-columns: minmax(230px,1fr) auto auto; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: .8rem; }
+  .search-field { display: flex; min-width: 0; align-items: center; gap: .6rem; padding: 0 .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); }
+  .search-field:focus-within { border-color: var(--emerald); }
+  .search-field input { width: 100%; min-height: 44px; border: 0; outline: 0; color: var(--ink); background: transparent; }
+  .filter-tabs { display: flex; padding: .25rem; border-radius: 999px; background: var(--paper-muted); }
+  .filter-tabs button { min-height: 38px; padding: .4rem .8rem; border: 0; border-radius: 999px; color: var(--ink-soft); background: transparent; cursor: pointer; }
+  .filter-tabs button.active { color: var(--accent-ink); background: var(--emerald); }
+  .result-row { display: flex; min-height: 2rem; align-items: center; justify-content: space-between; gap: 1rem; }
+  .result-row p { margin: 0 0 1rem; }
+  .surah-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+  .reader-note { position: relative; text-align: center; background: var(--teal-soft); }
+  .reader-note .eyebrow { justify-content: center; }
+  .reader-note .lead { margin-inline: auto; }
+  @media (max-width: 1000px) { .surah-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .library-controls { grid-template-columns: 1fr auto; } .search-field { grid-column: 1/-1; } }
+  @media (max-width: 640px) { .quran-hero { min-height: 540px; } .surah-grid { grid-template-columns: 1fr; } .library-controls { position: static; grid-template-columns: 1fr; border-radius: 1rem; } .search-field { grid-column: auto; } .filter-tabs { overflow-x: auto; } .filter-tabs button { flex: 1; } .random-surah { width: 100%; } }
+</style>
+
+<script>
+  function setupLibrary() {
+    const input = document.querySelector<HTMLInputElement>('[data-surah-search]');
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-surah-card]')];
+    const filters = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const count = document.querySelector<HTMLElement>('[data-result-count]');
+    const empty = document.querySelector<HTMLElement>('[data-empty-message]');
+    if (!input || input.dataset.ready) return;
+    input.dataset.ready = 'true';
+    let activeFilter = 'all';
+    const favourites = () => {
+      try { return new Set<number>(JSON.parse(localStorage.getItem('nafis:quran-player:v1') || '{}').favourites || []); } catch { return new Set<number>(); }
+    };
+    const update = () => {
+      const query = input.value.toLocaleLowerCase().trim();
+      const saved = favourites();
+      let visible = 0;
+      cards.forEach((card) => {
+        const matchesSearch = !query || card.dataset.search?.includes(query);
+        const surahId = Number(card.querySelector('.surah-number')?.textContent);
+        const matchesFilter = activeFilter === 'all' || (activeFilter === 'recorded' && card.dataset.recorded === 'true') || (activeFilter === 'favourites' && saved.has(surahId));
+        card.hidden = !(matchesSearch && matchesFilter);
+        if (!card.hidden) visible++;
+      });
+      if (count) count.textContent = String(visible);
+      if (empty) empty.hidden = visible !== 0;
+    };
+    input.addEventListener('input', () => { update(); (window as any).plausible?.('Surah Search'); });
+    filters.forEach((button) => button.addEventListener('click', () => { activeFilter = button.dataset.filter || 'all'; filters.forEach((item) => item.classList.toggle('active', item === button)); update(); }));
+    document.querySelector('[data-random-surah]')?.addEventListener('click', () => {
+      const visible = cards.filter((card) => !card.hidden);
+      const link = visible[Math.floor(Math.random() * visible.length)]?.querySelector<HTMLAnchorElement>('.surah-link');
+      link?.click();
+    });
+    document.addEventListener('nafis:favouriteschange', update);
+    update();
+  }
+  setupLibrary();
+  document.addEventListener('astro:page-load', setupLibrary);
+</script>

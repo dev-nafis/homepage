@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SocialDock from '../components/SocialDock.astro';
+import { withBase } from '../lib/route';
+import Icon from '../components/Icon.astro';
+---
+<BaseLayout title="About Nafis" description="Meet Nafis Al-Muhsin and discover the purpose behind his Qur’an recitations and visual translation videos." type="profile">
+  <header class="about-hero section">
+    <div class="narrow about-copy reveal"><p class="eyebrow">About the reciter</p><h1>A voice in service of the words.</h1><p class="lead">Nafis Al‑Muhsin is a Qur’an reciter and digital creator sharing recitations that make space for stillness, reflection, and a closer relationship with the Qur’an.</p></div>
+  </header>
+
+  <section class="section manifesto"><div class="narrow reveal"><p class="eyebrow">The intention</p><h2>More than something to play in the background.</h2><p class="lead">Every recitation is created as an invitation: pause what you are doing, follow the Arabic, sit with the meaning, and let the words take their proper place at the centre of the moment.</p><p>The project began with regular social posts and has grown into a connected library across YouTube, Instagram, TikTok, and Spotify. This website brings those fragments together in a calmer space built specifically for listening.</p></div></section>
+
+  <section class="section process-section"><div class="container"><div class="section-heading reveal"><div><p class="eyebrow">The process</p><h2>Recite. Refine. Share.</h2></div></div><ol class="process-grid"><li class="card reveal"><span>01</span><h3>Recitation</h3><p>Each Surah is approached with care, clear pacing, and respect for the rhythm of its ayat.</p></li><li class="card reveal"><span>02</span><h3>Production</h3><p>Audio and visuals are shaped to support the words without competing with them.</p></li><li class="card reveal"><span>03</span><h3>Connection</h3><p>The finished work is shared where listeners already are, then preserved here for easy return.</p></li></ol></div></section>
+
+  <section class="section-sm"><div class="container reveal"><SocialDock heading="Choose your platform." description="Find new recitations and visual translations in the places you already use." /></div></section>
+  <section class="section about-cta"><div class="narrow reveal"><p class="eyebrow">Work together</p><h2>Have a recitation or visual project in mind?</h2><p class="lead">For events, creative collaborations, and thoughtful recitation requests, send a short note.</p><a class="button" href={withBase('/contact/')}>Start a conversation <Icon name="arrow" /></a></div></section>
+</BaseLayout>
+
+<style>
+  .about-hero { padding-top: clamp(4rem,8vw,8rem); background: var(--paper); }
+  .about-copy h1 { max-width: 10ch; }
+  .manifesto { color: var(--on-strong); background: var(--surface-strong); }
+  .manifesto .eyebrow { color: var(--gold); }.manifesto .lead,.manifesto p { color: var(--on-strong-soft); }.manifesto h2 { color: var(--on-strong); }
+  .process-section { background: var(--paper-raised); }
+  .process-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; padding: 0; list-style: none; }
+  .process-grid li { padding: 1.5rem; }
+  .process-grid li > span { display: block; margin-bottom: 2rem; color: var(--gold); font-size: .7rem; font-weight: 700; }
+  .process-grid p { margin: 0; color: var(--ink-soft); }
+  .about-cta { text-align: center; background: var(--teal-soft); }.about-cta .eyebrow { justify-content: center; }.about-cta .lead { margin-inline: auto; }
+  @media (max-width: 760px) { .process-grid { grid-template-columns: 1fr; } }
+</style>
