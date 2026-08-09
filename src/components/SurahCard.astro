@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { slugifyChapter, formatDuration } from '../lib/quran';
+import { withBase } from '../lib/route';
 import type { QuranChapter, Recitation } from '../types';
 
 interface Props { chapter: QuranChapter; recitation?: Recitation; compact?: boolean; }
@@ -8,7 +9,7 @@ const { chapter, recitation, compact = false } = Astro.props;
 const slug = slugifyChapter(chapter);
 ---
 <article class:list={['surah-card', 'card', { recorded: !!recitation, compact }]} data-surah-card data-search={`${chapter.id} ${chapter.transliteration} ${chapter.translation} ${chapter.name}`.toLowerCase()} data-recorded={recitation ? 'true' : 'false'}>
-  <a class="surah-link" href={`/quran/${slug}/`} aria-label={`Open ${chapter.transliteration}`}>
+  <a class="surah-link" href={withBase(`/quran/${slug}/`)} aria-label={`Open ${chapter.transliteration}`}>
     <span class="surah-number">{String(chapter.id).padStart(3, '0')}</span>
     <span class="surah-copy">
       <strong>{chapter.transliteration}</strong>
@@ -29,7 +30,7 @@ const slug = slugifyChapter(chapter);
           data-audio={recitation.audio}
           data-title={recitation.title}
           data-surah={recitation.surahId}
-          data-url={`/quran/${slug}/`}
+          data-url={withBase(`/quran/${slug}/`)}
           data-cues={JSON.stringify(recitation.cues)}
         ><Icon name="play" size={17} /></button>
       </>

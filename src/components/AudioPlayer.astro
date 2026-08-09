@@ -2,12 +2,13 @@
 import { getCollection } from 'astro:content';
 import Icon from './Icon.astro';
 import { chapters, slugifyChapter } from '../lib/quran';
+import { withBase } from '../lib/route';
 
 const entries = await getCollection('recitations');
 const playlist = entries
   .map((entry) => {
     const chapter = chapters.find((item) => item.id === entry.data.surahId)!;
-    return { audio: entry.data.audio, title: entry.data.title, surah: entry.data.surahId, url: `/quran/${slugifyChapter(chapter)}/`, cues: entry.data.cues };
+    return { audio: withBase(entry.data.audio), title: entry.data.title, surah: entry.data.surahId, url: withBase(`/quran/${slugifyChapter(chapter)}/`), cues: entry.data.cues };
   })
   .sort((a, b) => a.surah - b.surah);
 ---
@@ -16,7 +17,7 @@ const playlist = entries
   <div class="player-inner">
     <div class="track-summary">
       <div class="track-art" aria-hidden="true"><span data-track-number>—</span></div>
-      <div class="track-copy"><span>Now playing</span><a href="/quran/" data-track-link><strong data-track-title>Select a recitation</strong></a></div>
+      <div class="track-copy"><span>Now playing</span><a href={withBase('/quran/')} data-track-link><strong data-track-title>Select a recitation</strong></a></div>
     </div>
     <div class="primary-controls">
       <button class="player-icon optional-control" type="button" aria-label="Back 10 seconds" data-skip="-10"><Icon name="skipBack" /></button>

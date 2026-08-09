@@ -1,3 +1,5 @@
+import { withBase } from '../lib/route';
+
 export const site = {
   name: 'Nafis Al-Muhsin',
   domain: 'nafisalmuhsin.com',
@@ -13,9 +15,9 @@ export const site = {
   ],
   nav: [
     { label: 'Home', href: '/' },
-    { label: 'Listen', href: '/quran/' },
-    { label: 'Videos', href: '/videos/' },
-    { label: 'About', href: '/about/' },
-    { label: 'Contact', href: '/contact/' }
+    { label: 'Listen', href: withBase('/quran/') },
+    { label: 'Videos', href: withBase('/videos/') },
+    { label: 'About', href: withBase('/about/') },
+    { label: 'Contact', href: withBase('/contact/') }
   ]
 } as const;

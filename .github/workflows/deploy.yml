@@ -38,8 +38,8 @@ jobs:
         run: npm test
       - name: Refresh curated YouTube videos
         run: npm run sync:youtube
-      - name: Build and validate
-        run: npm run build
+      - name: Build the /newsite preview route and retain the legacy root site
+        run: npm run build:newsite
       - name: Verify deploy artifact isolation
         shell: bash
         run: |

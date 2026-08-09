@@ -1,6 +1,7 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import { chapters, slugifyChapter } from '../lib/quran';
+import { withBase } from '../lib/route';
 
 export async function GET(context) {
   const recitations = await getCollection('recitations');
@@ -16,7 +17,7 @@ export async function GET(context) {
           title: entry.data.title,
           description: `Listen to ${entry.data.title} and follow the Arabic with English translation.`,
           pubDate: entry.data.publishedAt,
-          link: `/quran/${chapter ? slugifyChapter(chapter) : entry.id}/`
+          link: withBase(`/quran/${chapter ? slugifyChapter(chapter) : entry.id}/`)
         };
       })
   });

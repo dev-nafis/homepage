@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import { chapters, slugifyChapter, formatDuration } from '../../lib/quran';
 import source from '../../data/quran-source.json';
+import { withBase } from '../../lib/route';
 import type { QuranChapter, Recitation } from '../../types';
 
 export function getStaticPaths() {
@@ -19,11 +20,11 @@ const cues = new Map(recitation?.cues.map((cue) => [cue.verse, cue]) ?? []);
 const index = chapters.findIndex((item) => item.id === chapter.id);
 const previous = index > 0 ? chapters[index - 1] : undefined;
 const next = index < chapters.length - 1 ? chapters[index + 1] : undefined;
-const pageUrl = `/quran/${slugifyChapter(chapter)}/`;
+const pageUrl = withBase(`/quran/${slugifyChapter(chapter)}/`);
 const structuredData = [
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://nafisalmuhsin.com/' },
-    { '@type': 'ListItem', position: 2, name: 'Qur’an', item: 'https://nafisalmuhsin.com/quran/' },
+    { '@type': 'ListItem', position: 2, name: 'Qur’an', item: 'https://nafisalmuhsin.com/newsite/quran/' },
     { '@type': 'ListItem', position: 3, name: chapter.transliteration, item: `https://nafisalmuhsin.com${pageUrl}` }
   ]},
   ...(recitation ? [{ '@context': 'https://schema.org', '@type': 'AudioObject', name: recitation.title, contentUrl: `https://nafisalmuhsin.com${recitation.audio}`, duration: `PT${Math.round(recitation.duration)}S`, creator: { '@type': 'Person', name: 'Nafis Al-Muhsin' } }] : [])
@@ -33,7 +34,7 @@ const structuredData = [
   <header class="surah-hero">
     <div class="pattern"></div>
     <div class="container">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/quran/">Qur’an</a><span>/</span><span>{chapter.transliteration}</span></nav>
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={withBase('/')}>Home</a><span>/</span><a href={withBase('/quran/')}>Qur’an</a><span>/</span><span>{chapter.transliteration}</span></nav>
       <div class="surah-heading reveal">
         <div><p class="eyebrow">Surah {chapter.id} · {chapter.type === 'meccan' ? 'Makki' : 'Madani'}</p><h1>{chapter.transliteration}</h1><p class="lead">{chapter.translation} · {chapter.total_verses} ayat</p></div>
         <div class="surah-calligraphy" lang="ar" dir="rtl" translate="no">{chapter.name}</div>
@@ -42,8 +43,8 @@ const structuredData = [
         <div class="featured-audio card reveal">
           <div class="audio-symbol"><span></span><span></span><span></span><span></span><span></span></div>
           <div><small>Original recitation by Nafis Al‑Muhsin</small><strong>{recitation.title}</strong><span>{formatDuration(recitation.duration)} · Full Surah</span></div>
-          <button class="button" type="button" data-play-track data-audio={recitation.audio} data-title={recitation.title} data-surah={recitation.surahId} data-url={pageUrl} data-cues={JSON.stringify(recitation.cues)}><Icon name="play" /> Play recitation</button>
-          {recitation.downloadable && <a class="icon-button" href={recitation.audio} download aria-label={`Download ${recitation.title}`}><Icon name="download" /></a>}
+          <button class="button" type="button" data-play-track data-audio={withBase(recitation.audio)} data-title={recitation.title} data-surah={recitation.surahId} data-url={pageUrl} data-cues={JSON.stringify(recitation.cues)}><Icon name="play" /> Play recitation</button>
+          {recitation.downloadable && <a class="icon-button" href={withBase(recitation.audio)} download aria-label={`Download ${recitation.title}`}><Icon name="download" /></a>}
         </div>
       ) : (
         <div class="not-recorded card reveal"><span class="audio-symbol quiet"><span></span><span></span><span></span></span><div><strong>Nafis recording not yet available</strong><p>Read and reflect now. Original audio will appear here as the recitation library grows.</p></div></div>
@@ -70,8 +71,8 @@ const structuredData = [
   </section>
 
   <nav class="chapter-nav container" aria-label="Adjacent Surahs">
-    {previous ? <a href={`/quran/${slugifyChapter(previous)}/`}><Icon name="back" /><span><small>Previous Surah</small><strong>{previous.transliteration}</strong></span></a> : <span></span>}
-    {next && <a class="next" href={`/quran/${slugifyChapter(next)}/`}><span><small>Next Surah</small><strong>{next.transliteration}</strong></span><Icon name="arrow" /></a>}
+    {previous ? <a href={withBase(`/quran/${slugifyChapter(previous)}/`)}><Icon name="back" /><span><small>Previous Surah</small><strong>{previous.transliteration}</strong></span></a> : <span></span>}
+    {next && <a class="next" href={withBase(`/quran/${slugifyChapter(next)}/`)}><span><small>Next Surah</small><strong>{next.transliteration}</strong></span><Icon name="arrow" /></a>}
   </nav>
 </BaseLayout>
 

@@ -1,9 +1,9 @@
 {
   "name": "Nafis Al-Muhsin — Qur’an Reciter",
   "short_name": "Nafis Recites",
-  "start_url": "/",
+  "start_url": "/newsite/",
   "display": "standalone",
-  "background_color": "#071c1d",
-  "theme_color": "#0d685c",
-  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
+  "icons": [{ "src": "/newsite/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }

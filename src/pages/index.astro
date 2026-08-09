@@ -8,6 +8,7 @@ import PlaylistEmbed from '../components/PlaylistEmbed.astro';
 import SocialDock from '../components/SocialDock.astro';
 import portrait from '../assets/nafis-portrait.jpeg';
 import { chapters, slugifyChapter } from '../lib/quran';
+import { withBase } from '../lib/route';
 import { site } from '../data/site';
 import type { Recitation } from '../types';
 
@@ -19,7 +20,7 @@ const recordedChapters = recitations.map((recitation) => ({ chapter: chapters.fi
 const youtube = site.socials.find((social) => social.name === 'YouTube')!;
 const personSchema = {
   '@context': 'https://schema.org', '@type': 'Person', name: site.name, url: site.url,
-  image: `${site.url}/social-card.svg`, jobTitle: 'Qur’an Reciter', sameAs: site.socials.map((social) => social.url)
+  image: `${site.url}${withBase('/social-card.svg')}`, jobTitle: 'Qur’an Reciter', sameAs: site.socials.map((social) => social.url)
 };
 ---
 <BaseLayout structuredData={personSchema}>
@@ -37,7 +38,7 @@ const personSchema = {
           <p class="eyebrow">Assalamu alaikum — welcome</p>
           <h1>Thank you for listening.</h1>
           <p class="welcome-message">I’m Nafis Al-Muhsin. I’m grateful you’re here—follow the journey, watch the latest videos, or take a quiet moment with a recitation.</p>
-          <button class="listen-link" type="button" data-play-track data-audio={featuredRecitation.audio} data-title={featuredRecitation.title} data-surah={featuredRecitation.surahId} data-url={`/quran/${slugifyChapter(featuredChapter)}/`} data-cues={JSON.stringify(featuredRecitation.cues)}><Icon name="play" size={17} /> Listen to the latest recitation</button>
+          <button class="listen-link" type="button" data-play-track data-audio={withBase(featuredRecitation.audio)} data-title={featuredRecitation.title} data-surah={featuredRecitation.surahId} data-url={withBase(`/quran/${slugifyChapter(featuredChapter)}/`)} data-cues={JSON.stringify(featuredRecitation.cues)}><Icon name="play" size={17} /> Listen to the latest recitation</button>
         </div>
       </div>
     </div>
@@ -50,13 +51,13 @@ const personSchema = {
         <a class="button youtube-button" href={youtube.url} target="_blank" rel="noopener"><Icon name="youtube" /> Subscribe on YouTube</a>
       </div>
       <PlaylistEmbed playlistId="PLSw26XuZVejA" />
-      <div class="section-end"><a href="/videos/">See the complete video collection <Icon name="arrow" size={17} /></a></div>
+      <div class="section-end"><a href={withBase('/videos/')}>See the complete video collection <Icon name="arrow" size={17} /></a></div>
     </div>
   </section>
 
   <section class="recitations-section section" aria-labelledby="listen-heading">
     <div class="container">
-      <div class="section-heading"><div><p class="eyebrow">Listen</p><h2 id="listen-heading">Make space for a Surah.</h2><p class="section-summary">Choose a recitation, or open the Qur’an library to read every Surah.</p></div><a class="button secondary" href="/quran/">Open Qur’an library <Icon name="arrow" /></a></div>
+      <div class="section-heading"><div><p class="eyebrow">Listen</p><h2 id="listen-heading">Make space for a Surah.</h2><p class="section-summary">Choose a recitation, or open the Qur’an library to read every Surah.</p></div><a class="button secondary" href={withBase('/quran/')}>Open Qur’an library <Icon name="arrow" /></a></div>
       <div class="grid three">{recordedChapters.map(({ chapter, recitation }) => <SurahCard chapter={chapter} recitation={recitation} />)}</div>
     </div>
   </section>

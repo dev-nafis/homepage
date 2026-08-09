@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import SurahCard from '../../components/SurahCard.astro';
 import { chapters } from '../../lib/quran';
+import { withBase } from '../../lib/route';
 import type { Recitation } from '../../types';
 
 const entries = await getCollection('recitations');
@@ -40,7 +41,7 @@ const bySurah = new Map(recitations.map((item) => [item.surahId, item]));
   </section>
 
   <section class="reader-note section-sm">
-    <div class="narrow reveal"><p class="eyebrow">Translation note</p><h2>Read with context and care.</h2><p class="lead">The English text is Saheeh International, presented as a translation of meaning. Qur’anic Arabic remains the primary text and is deliberately protected from automatic browser translation.</p><a class="button secondary" href="/privacy/#quran-data">About our Qur’an data <Icon name="arrow" /></a></div>
+    <div class="narrow reveal"><p class="eyebrow">Translation note</p><h2>Read with context and care.</h2><p class="lead">The English text is Saheeh International, presented as a translation of meaning. Qur’anic Arabic remains the primary text and is deliberately protected from automatic browser translation.</p><a class="button secondary" href={withBase('/privacy/#quran-data')}>About our Qur’an data <Icon name="arrow" /></a></div>
   </section>
 </BaseLayout>
 

@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
+import { withBase } from '../lib/route';
 ---
 <BaseLayout title="Page not found" description="The page you requested could not be found.">
-  <section class="not-found"><div class="pattern"></div><div class="narrow reveal"><span>404</span><p class="eyebrow">Page not found</p><h1>This path has gone quiet.</h1><p class="lead">The page may have moved, but the recitations are still close by.</p><div class="button-row"><a class="button" href="/quran/">Explore the Qur’an <Icon name="arrow" /></a><a class="button secondary" href="/">Return home</a></div></div></section>
+  <section class="not-found"><div class="pattern"></div><div class="narrow reveal"><span>404</span><p class="eyebrow">Page not found</p><h1>This path has gone quiet.</h1><p class="lead">The page may have moved, but the recitations are still close by.</p><div class="button-row"><a class="button" href={withBase('/quran/')}>Explore the Qur’an <Icon name="arrow" /></a><a class="button secondary" href={withBase('/')}>Return home</a></div></div></section>
 </BaseLayout>
 
 <style>

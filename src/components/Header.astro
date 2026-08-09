@@ -1,11 +1,12 @@
 ---
 import Icon from './Icon.astro';
 import { site } from '../data/site';
+import { withBase } from '../lib/route';
 const path = Astro.url.pathname;
 ---
 <header class="site-header" data-header>
   <div class="container header-inner">
-    <a class="brand" href="/" aria-label={`${site.name} home`}>
+    <a class="brand" href={withBase('/')} aria-label={`${site.name} home`}>
       <span class="brand-mark" aria-hidden="true">ن</span>
       <span><strong>Nafis</strong><small>Qur’an Reciter</small></span>
     </a>

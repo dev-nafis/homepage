@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { site } from '../data/site';
+import { withBase } from '../lib/route';
 ---
 <footer class="site-footer">
   <div class="container footer-grid">
@@ -11,7 +12,7 @@ import { site } from '../data/site';
     <div class="footer-links">
       <div><strong>Explore</strong>{site.nav.map((item) => <a href={item.href}>{item.label}</a>)}</div>
       <div><strong>Follow</strong>{site.socials.map((social) => <a href={social.url} target="_blank" rel="me noopener">{social.name}</a>)}</div>
-      <div><strong>Details</strong><a href="/privacy/">Privacy</a></div>
+      <div><strong>Details</strong><a href={withBase('/privacy/')}>Privacy</a></div>
     </div>
   </div>
   <div class="container footer-base">
