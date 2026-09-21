@@ -4,7 +4,7 @@ Reviewed during the Astro migration on 2026-08-05.
 
 ## Findings
 
-The repository contains legacy website files at its root and unrelated projects under `WebDesign/`. Those unrelated materials include server-side application data and development artifacts such as a Flask database, audit log, document lock file, caches, and compiled Python files. They are outside the Astro source tree and are not needed by this website.
+The previous root website is retained only in `legacy-site-backup/` for rollback. The unrelated `WebDesign/` projects, including their server-side data and development artifacts, have been removed from this repository and are not part of the website.
 
 They were not deleted because they may belong to separate user projects. They must never be deployed publicly.
 
