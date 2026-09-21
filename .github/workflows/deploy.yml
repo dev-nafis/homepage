@@ -22,6 +22,7 @@ jobs:
     environment: github-pages
     env:
       PUBLIC_FORMSPREE_ENDPOINT: ${{ secrets.PUBLIC_FORMSPREE_ENDPOINT }}
+      REQUIRE_FORMSPREE: 'true'
       PUBLIC_PLAUSIBLE_DOMAIN: ${{ vars.PUBLIC_PLAUSIBLE_DOMAIN }}
       YOUTUBE_PLAYLIST_ID: PLSw26XuZVejA
     steps:
