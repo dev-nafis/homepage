@@ -77,7 +77,7 @@ The sync script verifies the configured translation resource still exists and re
 
 The GitHub Pages workflow tests and builds the site, audits the artifact, and uploads only `dist/`. `CNAME` lives in `public/` and is copied into the artifact. Configure Pages to use **GitHub Actions**, not branch-folder deployment.
 
-Legacy files and the unrelated `WebDesign/` projects are intentionally not part of Astro’s source tree and never enter the deployment artifact. See `SECURITY_AUDIT.md` for the repository exposure review.
+The previous static root site is preserved in `legacy-site-backup/` for rollback, but is excluded from the active Astro build. Unrelated legacy projects have been removed from this repository. See `SECURITY_AUDIT.md` for the exposure review.
 
 ## Pre-launch editorial checklist
 

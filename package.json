@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "astro dev",
     "build": "npm run validate && astro build",
-    "build:newsite": "npm run validate && tsx scripts/build-newsite.ts",
     "preview": "astro preview",
     "validate": "tsx scripts/validate-content.ts",
     "sync:quran": "tsx scripts/sync-quran.ts",
