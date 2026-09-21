@@ -21,16 +21,29 @@ const index = chapters.findIndex((item) => item.id === chapter.id);
 const previous = index > 0 ? chapters[index - 1] : undefined;
 const next = index < chapters.length - 1 ? chapters[index + 1] : undefined;
 const pageUrl = withBase(`/quran/${slugifyChapter(chapter)}/`);
+const canonicalUrl = `https://nafisalmuhsin.com${pageUrl}`;
+const searchTitle = `Surah ${chapter.transliteration} (${chapter.name}) — ${chapter.translation}: Arabic & English Translation`;
+const searchDescription = `Read Surah ${chapter.transliteration} (${chapter.name}), ${chapter.translation}, from the Qur’an in Arabic and Saheeh International English translation. ${chapter.total_verses} ayat${recitation ? ', with an original recitation by Nafis Al-Muhsin.' : '.'}`;
 const structuredData = [
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://nafisalmuhsin.com/' },
     { '@type': 'ListItem', position: 2, name: 'Qur’an', item: 'https://nafisalmuhsin.com/quran/' },
     { '@type': 'ListItem', position: 3, name: chapter.transliteration, item: `https://nafisalmuhsin.com${pageUrl}` }
   ]},
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: searchTitle,
+    url: canonicalUrl,
+    description: searchDescription,
+    inLanguage: ['en', 'ar'],
+    about: { '@type': 'Thing', name: `Surah ${chapter.transliteration}` },
+    isPartOf: { '@type': 'WebSite', name: 'Nafis Al-Muhsin', url: 'https://nafisalmuhsin.com/' }
+  },
   ...(recitation ? [{ '@context': 'https://schema.org', '@type': 'AudioObject', name: recitation.title, contentUrl: `https://nafisalmuhsin.com${recitation.audio}`, duration: `PT${Math.round(recitation.duration)}S`, creator: { '@type': 'Person', name: 'Nafis Al-Muhsin' } }] : [])
 ];
 ---
-<BaseLayout title={`Surah ${chapter.transliteration}`} description={`Read Surah ${chapter.transliteration} (${chapter.translation}) in Arabic with Saheeh International English translation${recitation ? ' and listen to Nafis Al-Muhsin’s recitation' : ''}.`} type={recitation ? 'music.song' : 'article'} structuredData={structuredData}>
+<BaseLayout title={searchTitle} description={searchDescription} type={recitation ? 'music.song' : 'article'} structuredData={structuredData}>
   <header class="surah-hero">
     <div class="pattern"></div>
     <div class="container">

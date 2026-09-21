@@ -25,6 +25,16 @@ const {
 const canonical = new URL(Astro.url.pathname, site.url);
 const fullTitle = title === site.title ? title : `${title} | ${site.name}`;
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
+const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.name,
+  url: site.url,
+  description: site.description,
+  inLanguage: 'en-GB'
+};
 ---
 <!doctype html>
 <html lang="en" data-theme="dark">
@@ -33,14 +43,18 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b0b0c" />
     <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="google" content="notranslate" />
+    {googleVerification && <meta name="google-site-verification" content={googleVerification} />}
+    {bingVerification && <meta name="msvalidate.01" content={bingVerification} />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
     <link rel="manifest" href={withBase('/site.webmanifest')} />
     <link rel="alternate" type="application/rss+xml" title="Nafis Al-Muhsin recitations" href={withBase('/rss.xml')} />
     <title>{fullTitle}</title>
     <meta property="og:type" content={type} />
+    <meta property="og:locale" content="en_GB" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -53,7 +67,7 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
     <script is:inline>
       (() => { document.documentElement.classList.add('js'); try { const preference = localStorage.getItem('nafis:theme') || 'dark'; const theme = preference === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : preference; document.documentElement.dataset.theme = theme; document.documentElement.dataset.themePreference = preference; } catch {} })();
     </script>
-    {structuredData && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+    <script type="application/ld+json" set:html={JSON.stringify([websiteSchema, ...(structuredData ? (Array.isArray(structuredData) ? structuredData : [structuredData]) : [])])} />
     {plausibleDomain && <script defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>}
     <ClientRouter fallback="swap" />
   </head>
