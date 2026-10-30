@@ -4,7 +4,6 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import SurahCard from '../components/SurahCard.astro';
-import PlaylistEmbed from '../components/PlaylistEmbed.astro';
 import SocialDock from '../components/SocialDock.astro';
 import portrait from '../assets/main-profile-picture.jpg';
 import { chapters, slugifyChapter } from '../lib/quran';
@@ -17,7 +16,6 @@ const recitations = recitationEntries.map(({ id, data }) => ({ id, ...data, publ
 const featuredRecitation = recitations.find((item) => item.featured) ?? recitations[0];
 const featuredChapter = chapters.find((item) => item.id === featuredRecitation.surahId)!;
 const recordedChapters = recitations.map((recitation) => ({ chapter: chapters.find((chapter) => chapter.id === recitation.surahId)!, recitation }));
-const youtube = site.socials.find((social) => social.name === 'YouTube')!;
 const personSchema = {
   '@context': 'https://schema.org', '@type': 'Person', name: site.name, url: site.url,
   image: `${site.url}${withBase('/social-card.svg')}`, jobTitle: 'Qur’an Reciter', sameAs: site.socials.map((social) => social.url)
@@ -27,37 +25,53 @@ const personSchema = {
   <section class="home-intro">
     <aside class="follow-bar">
       <div class="container">
-        <SocialDock heading="FOLLOW ME" description="New recitations and videos shared where you already listen.">
+        <SocialDock eyebrow="Follow me" heading="Nafis Al-Muhsin" description="New recitations and videos shared where you already listen.">
           <Image slot="media" src={portrait} alt="Nafis Al-Muhsin" widths={[160,240]} sizes="(max-width: 560px) 80px, 112px" format="webp" loading="eager" />
         </SocialDock>
       </div>
     </aside>
-    <div class="welcome-hero">
-      <div class="narrow welcome-grid">
-        <div class="welcome-copy">
-          <p class="eyebrow">Assalamu alaikum — welcome</p>
-          <h1>Thank you for listening.</h1>
-          <p class="welcome-message">I’m Nafis Al-Muhsin. I’m grateful you’re here—follow the journey, watch the latest videos, or take a quiet moment with a recitation📖❣️.</p>
-          <button class="listen-link" type="button" data-play-track data-audio={withBase(featuredRecitation.audio)} data-title={featuredRecitation.title} data-surah={featuredRecitation.surahId} data-url={withBase(`/quran/${slugifyChapter(featuredChapter)}/`)} data-cues={JSON.stringify(featuredRecitation.cues)}><Icon name="play" size={17} /> Listen to the latest recitation</button>
+    <div class="hero-slider" data-hero-slider role="region" aria-roledescription="carousel" aria-label="Welcome, popular videos and contact">
+      <div class="hero-viewport">
+        <div class="hero-track" data-hero-track>
+          <div class="hero-slide welcome-hero" data-hero-slide role="group" aria-roledescription="slide" aria-label="1 of 3: Welcome">
+            <div class="narrow welcome-grid">
+              <div class="welcome-copy">
+                <p class="eyebrow">Assalamu alaikum — welcome</p>
+                <h1>Read, listen and explore.</h1>
+                <p class="welcome-message">Listen to complete Surahs, read Arabic alongside English meaning, and watch visual Qur’an videos—all in one calm place.</p>
+                <button class="listen-link" type="button" data-play-track data-audio={withBase(featuredRecitation.audio)} data-title={featuredRecitation.title} data-surah={featuredRecitation.surahId} data-url={withBase(`/quran/${slugifyChapter(featuredChapter)}/`)} data-cues={JSON.stringify(featuredRecitation.cues)}><span class="listen-link-icon"><Icon name="play" size={17} /></span> Listen to a complete Surah <Icon name="arrow" size={17} /></button>
+              </div>
+            </div>
+          </div>
+          <div class="hero-slide popular-videos-slide" data-hero-slide role="group" aria-roledescription="slide" aria-label="2 of 3: Popular videos" aria-hidden="true" inert>
+            <div class="narrow video-slide-content">
+              <p class="eyebrow">Popular videos</p>
+              <h2>Watch and listen.</h2>
+              <p class="welcome-message">Explore visual Qur’an recitations and translations, including Nafis’s popular YouTube playlist.</p>
+              <a class="listen-link video-link" href={withBase('/videos/')}><span class="listen-link-icon"><Icon name="youtube" size={20} /></span> Watch Popular Videos <Icon name="arrow" size={17} /></a>
+            </div>
+          </div>
+          <div class="hero-slide contact-slide" data-hero-slide role="group" aria-roledescription="slide" aria-label="3 of 3: Contact" aria-hidden="true" inert>
+            <div class="narrow contact-slide-content">
+              <p class="eyebrow">Get in touch</p>
+              <h2>Have something in mind?</h2>
+              <p class="welcome-message">For events, charity tours, recitation invitations or anything else, send me a message.</p>
+              <a class="listen-link contact-link" href={withBase('/contact/')}><span class="listen-link-icon"><Icon name="mail" size={20} /></span> Contact Nafis <Icon name="arrow" size={17} /></a>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="youtube-section section" aria-labelledby="popular-videos-heading">
-    <div class="container">
-      <div class="section-heading">
-        <div><p class="eyebrow">Popular videos</p><h2 id="popular-videos-heading">Watch, then come back to it.</h2><p class="section-summary">The most-viewed recitations, kept current from YouTube.</p></div>
-        <a class="button youtube-button" href={youtube.url} target="_blank" rel="noopener"><Icon name="youtube" /> Subscribe on YouTube</a>
+      <div class="slider-controls" role="group" aria-label="Slider controls">
+        <button type="button" aria-label="Show welcome" aria-current="true" data-hero-control="0"></button>
+        <button type="button" aria-label="Show popular videos" aria-current="false" data-hero-control="1"></button>
+        <button type="button" aria-label="Show contact" aria-current="false" data-hero-control="2"></button>
       </div>
-      <PlaylistEmbed playlistId="PLSw26XuZVejA" />
-      <div class="section-end"><a href={withBase('/videos/')}>See the complete video collection <Icon name="arrow" size={17} /></a></div>
     </div>
   </section>
 
   <section class="recitations-section section" aria-labelledby="listen-heading">
     <div class="container">
-      <div class="section-heading"><div><p class="eyebrow">Listen</p><h2 id="listen-heading">Make space for a Surah.</h2><p class="section-summary">Choose a recitation, or open the Qur’an library to read every Surah.</p></div><a class="button secondary" href={withBase('/quran/')}>Open Qur’an library <Icon name="arrow" /></a></div>
+      <div class="section-heading"><div><p class="eyebrow">Listen</p><h2 id="listen-heading">Make space for a Surah.</h2><p class="section-summary">Choose a complete recitation, or open the Qur’an library to read every Surah.</p></div><a class="button secondary" href={withBase('/quran/')}>Open Qur’an library <Icon name="arrow" /></a></div>
       <div class="grid three">{recordedChapters.map(({ chapter, recitation }) => <SurahCard chapter={chapter} recitation={recitation} />)}</div>
     </div>
   </section>
@@ -66,20 +80,37 @@ const personSchema = {
 <style>
   .follow-bar { padding-block: clamp(1.25rem,3vw,2rem); border-bottom: 1px solid var(--line); background: var(--paper-raised); }
   .home-intro { background: var(--paper); }
-  .welcome-hero { padding-block: clamp(3rem,6vw,5rem); background: var(--paper); }
-  .welcome-grid { text-align: center; }
-  .welcome-copy { min-width: 0; }.welcome-copy .eyebrow { justify-content: center; }
-  .welcome-copy h1 { max-width: 10ch; margin-bottom: 1.1rem; font-size: clamp(3rem,5vw,4.9rem); }
-  .welcome-message { max-width: 56ch; margin-inline: auto; color: var(--ink-soft); font-size: clamp(1.08rem,1.8vw,1.25rem); }
-  .listen-link, .section-end a { display: inline-flex; min-height: 48px; align-items: center; gap: .5rem; margin-top: 1.25rem; padding: .65rem 0; border: 0; color: var(--emerald); background: transparent; font-weight: 700; text-decoration: none; cursor: pointer; }
-  .youtube-section { border-top: 1px solid var(--line); background: var(--paper-raised); }
+  .hero-slider { position: relative; }
+  .hero-viewport { overflow: hidden; }
+  .hero-track { display: flex; align-items: stretch; transform: translate3d(calc(var(--slide-index, 0) * -100%),0,0); transition: transform 550ms cubic-bezier(.22,.61,.36,1); }
+  .hero-slide { display: grid; flex: 0 0 100%; min-width: 0; align-items: center; padding-block: clamp(2rem,4vw,3rem); }
+  .welcome-hero { background: var(--paper); }
+  .popular-videos-slide { background: var(--paper-raised); }
+  .contact-slide { background: var(--paper); }
+  .welcome-grid, .video-slide-content, .contact-slide-content { text-align: center; }
+  .welcome-copy { min-width: 0; }
+  .welcome-copy .eyebrow, .video-slide-content .eyebrow, .contact-slide-content .eyebrow { justify-content: center; }
+  .welcome-copy h1, .video-slide-content h2, .contact-slide-content h2 { margin-bottom: .65rem; font-size: clamp(2rem,3.5vw,3.2rem); }
+  .welcome-message { max-width: 52ch; margin-inline: auto; color: var(--ink-soft); font-size: clamp(1rem,1.5vw,1.12rem); }
+  .listen-link { display: inline-flex; min-height: 50px; align-items: center; gap: .65rem; margin-top: 1.15rem; padding: .45rem 1rem .45rem .5rem; border: 1px solid color-mix(in srgb,var(--gold) 68%,var(--line)); border-radius: 999px; color: var(--accent-ink); background: linear-gradient(135deg,var(--emerald),var(--emerald-bright)); box-shadow: 0 10px 24px color-mix(in srgb,var(--emerald) 25%,transparent); font-weight: 800; text-decoration: none; cursor: pointer; transition: transform 180ms ease, box-shadow 180ms ease; }
+  .listen-link:hover { box-shadow: 0 14px 30px color-mix(in srgb,var(--emerald) 38%,transparent); transform: translateY(-2px); }
+  .listen-link-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; color: var(--emerald); background: var(--paper); }
+  .video-link { color: #fff; background: #c51f1f; box-shadow: 0 10px 24px rgb(197 31 31 / 20%); }
+  .video-link:hover { box-shadow: 0 14px 30px rgb(197 31 31 / 30%); }
+  .video-link .listen-link-icon { color: #c51f1f; }
+  .contact-link { color: var(--ink); background: var(--paper-muted); box-shadow: none; }
+  .contact-link:hover { background: var(--paper-raised); box-shadow: var(--shadow-soft); }
+  .contact-link .listen-link-icon { color: #17130c; background: var(--gold); }
+  .slider-controls { display: flex; min-height: 60px; align-items: center; justify-content: center; gap: .3rem; padding: .5rem 1rem .75rem; background: var(--paper); }
+  .slider-controls button { display: grid; width: 44px; height: 44px; padding: 0; place-items: center; border: 0; border-radius: 999px; color: var(--ink-soft); background: transparent; cursor: pointer; }
+  .slider-controls button::before { display: block; width: 28px; height: 7px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper-muted); content: ''; transition: width 180ms ease, background 180ms ease; }
+  .slider-controls button[aria-current="true"]::before { width: 36px; border-color: var(--gold); background: var(--gold); }
+  .slider-controls button:hover { background: var(--paper-muted); }
+  .slider-controls button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   .section-summary { max-width: 58ch; margin: .8rem 0 0; color: var(--ink-soft); }
-  .youtube-button { color: #fff; background: #c51f1f; box-shadow: none; }
-  .youtube-button:hover { background: #a91919; }
-  .section-end { display: flex; justify-content: flex-end; margin-top: 1.4rem; }
   .recitations-section { background: var(--paper); }
   @media (max-width: 760px) { .section-heading { text-align: left; } }
-  @media (max-width: 600px) { .welcome-copy h1 { font-size: clamp(2.75rem,13vw,4rem); }.section-end { justify-content: flex-start; } }
+  @media (prefers-reduced-motion: reduce) { .hero-track, .slider-controls button::before { transition: none; } }
 </style>
 
 <script>
@@ -87,4 +118,73 @@ const personSchema = {
     const social = (event.target as Element).closest<HTMLElement>('[data-social-link]');
     if (social) (window as any).plausible?.('Social Click', { props: { platform: social.dataset.socialLink } });
   });
+
+  function setupHeroSlider() {
+    const slider = document.querySelector<HTMLElement>('[data-hero-slider]');
+    if (!slider || slider.dataset.ready) return;
+    slider.dataset.ready = 'true';
+    const track = slider.querySelector<HTMLElement>('[data-hero-track]');
+    const slides = [...slider.querySelectorAll<HTMLElement>('[data-hero-slide]')];
+    const controls = [...slider.querySelectorAll<HTMLButtonElement>('[data-hero-control]')];
+    if (!track || slides.length < 2) return;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const loopSlide = slides[0].cloneNode(true) as HTMLElement;
+    loopSlide.removeAttribute('data-hero-slide');
+    loopSlide.setAttribute('aria-hidden', 'true');
+    loopSlide.inert = true;
+    track.appendChild(loopSlide);
+    let active = 0;
+    let timer: number | undefined;
+    let wrapping = false;
+    const show = (index: number) => {
+      if (wrapping || index === active || index < 0 || index >= slides.length) return;
+      const loopsToStart = active === slides.length - 1 && index === 0 && !reduceMotion.matches;
+      active = index;
+      if (loopsToStart) {
+        wrapping = true;
+        track.style.setProperty('--slide-index', String(slides.length));
+        const resetLoop = (event: TransitionEvent) => {
+          if (event.target !== track || event.propertyName !== 'transform') return;
+          track.removeEventListener('transitionend', resetLoop);
+          track.style.transition = 'none';
+          track.style.setProperty('--slide-index', '0');
+          void track.offsetWidth;
+          track.style.removeProperty('transition');
+          wrapping = false;
+        };
+        track.addEventListener('transitionend', resetLoop);
+      } else {
+        track.style.setProperty('--slide-index', String(active));
+      }
+      slides.forEach((slide, slideIndex) => {
+        slide.inert = slideIndex !== active;
+        slide.setAttribute('aria-hidden', String(slideIndex !== active));
+      });
+      controls.forEach((control, controlIndex) => control.setAttribute('aria-current', String(controlIndex === active)));
+    };
+    const stop = () => { if (timer !== undefined) window.clearInterval(timer); timer = undefined; };
+    const start = () => {
+      stop();
+      if (!reduceMotion.matches && !slider.matches(':focus-within') && !document.hidden) {
+        timer = window.setInterval(() => show((active + 1) % slides.length), 6000);
+      }
+    };
+    controls.forEach((control) => control.addEventListener('click', (event) => {
+      show(Number(control.dataset.heroControl));
+      if (event.detail > 0) control.blur();
+      start();
+    }));
+    slider.addEventListener('focusin', stop);
+    slider.addEventListener('focusout', () => window.setTimeout(() => { if (!slider.matches(':focus-within')) start(); }, 0));
+    reduceMotion.addEventListener('change', start);
+    document.addEventListener('visibilitychange', start);
+    document.addEventListener('astro:before-swap', () => {
+      stop();
+      reduceMotion.removeEventListener('change', start);
+      document.removeEventListener('visibilitychange', start);
+    }, { once: true });
+    start();
+  }
+  setupHeroSlider();
+  document.addEventListener('astro:page-load', setupHeroSlider);
 </script>

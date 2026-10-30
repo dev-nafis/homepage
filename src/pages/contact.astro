@@ -5,8 +5,8 @@ import SocialDock from '../components/SocialDock.astro';
 const endpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT;
 const configured = !!endpoint && !endpoint.includes('your-form-id');
 ---
-<BaseLayout title="Contact" description="Contact Nafis Al-Muhsin for recitation requests, events, bookings, and creative collaborations.">
-  <header class="page-hero contact-hero"><div class="orb"></div><div class="pattern"></div><div class="container reveal"><p class="eyebrow">Get in touch</p><h1>Let’s create something meaningful.</h1><p class="lead">Recitation requests, event invitations, and creative collaborations are welcome. Share enough detail to make the first reply useful.</p></div></header>
+<BaseLayout title="Contact" description="Contact Nafis Al-Muhsin for recitation requests, events, charity tours, bookings, and creative collaborations.">
+  <header class="page-hero contact-hero"><div class="orb"></div><div class="pattern"></div><div class="container reveal"><p class="eyebrow">Get in touch</p><h1>Let’s create something meaningful.</h1><p class="lead">Recitation requests, event invitations, charity tours, and creative collaborations are welcome. Share enough detail to make the first reply useful.</p></div></header>
   <section class="section-sm contact-section"><div class="container contact-grid">
     <div class="contact-aside reveal">
       <p class="eyebrow">Before you send</p><h2>A few helpful details.</h2>
@@ -17,7 +17,7 @@ const configured = !!endpoint && !endpoint.includes('your-form-id');
       <form id="enquiry-form" action={endpoint || ''} method="POST" data-contact-form data-configured={String(configured)} novalidate>
         <div class="form-heading"><span>Enquiry form</span><p>Fields marked * are required.</p></div>
         <div class="field-row"><label><span>Name *</span><input type="text" name="name" autocomplete="name" required /></label><label><span>Email *</span><input type="email" name="email" autocomplete="email" required /></label></div>
-        <label><span>Enquiry type *</span><select name="enquiry_type" required><option value="">Choose one</option><option value="Creative collaboration">Creative collaboration</option><option value="Event or booking">Event or booking</option><option value="Recitation request">Recitation request</option><option value="General enquiry">General enquiry</option></select></label>
+        <label><span>Enquiry type *</span><select name="enquiry_type" required><option value="">Choose one</option><option value="Creative collaboration">Creative collaboration</option><option value="Event or booking">Event or booking</option><option value="Charity tour">Charity tour</option><option value="Recitation request">Recitation request</option><option value="General enquiry">General enquiry</option></select></label>
         <label><span>Project or event date</span><input type="date" name="event_date" /></label>
         <label><span>Message *</span><textarea name="message" rows="7" minlength="20" required placeholder="Tell me about the idea, audience, timing, and where the work will be used."></textarea></label>
         <label class="consent"><input type="checkbox" name="consent" required /><span>I agree that my details may be used to respond to this enquiry. *</span></label>

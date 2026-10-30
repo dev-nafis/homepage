@@ -3,18 +3,19 @@ import Icon from './Icon.astro';
 import { site } from '../data/site';
 
 interface Props {
+  eyebrow?: string;
   heading?: string;
   description?: string;
 }
 
-const { heading = 'Follow Nafis', description } = Astro.props;
+const { eyebrow = 'Stay connected', heading = 'Follow Nafis', description } = Astro.props;
 const hasMedia = Astro.slots.has('media');
 ---
 
 <div class:list={['social-dock', { 'has-media': hasMedia }]}>
   {hasMedia && <div class="social-dock-media"><slot name="media" /></div>}
   <div class="social-dock-heading">
-    <p class="eyebrow">Stay connected</p>
+    <p class="eyebrow">{eyebrow}</p>
     <h2 id="social-dock-title">{heading}</h2>
     {description && <p>{description}</p>}
   </div>
@@ -48,12 +49,14 @@ const hasMedia = Astro.slots.has('media');
   .social-youtube { --brand: #e52424; }
   .social-tiktok { --brand: #202020; }
   .social-spotify { --brand: #1db954; }.social-spotify .social-brand { color: #0a201c; }
-  @media (max-width: 560px) { .social-dock.has-media { grid-template-columns: 80px minmax(0,1fr); gap: .85rem 1rem; }.social-dock-media { width: 80px; border-radius: .85rem; } }
-  @media (max-width: 430px) {
-    .social-dock-links { gap: .3rem; }
-    .social-dock-links a { min-height: 62px; grid-template-columns: 1fr; grid-template-rows: 26px auto; justify-items: center; gap: .1rem; padding: .3rem .15rem; font-size: .62rem; letter-spacing: -.02em; text-align: center; }
-    .social-brand { width: 24px; height: 24px; border-radius: .45rem; }.social-brand :global(svg) { width: 16px; height: 16px; }
-    .social-name { width: 100%; overflow: visible; text-overflow: clip; }
-    .social-dock-links > a > :last-child { display: none; }
+  @media (max-width: 560px) {
+    .social-dock.has-media { grid-template-columns: 80px minmax(0,1fr); gap: .85rem 1rem; }
+    .social-dock-media { width: 80px; border-radius: .85rem; }
+    .social-dock-links { grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; }
+    .social-dock-links a { min-height: 72px; grid-template-columns: 44px minmax(0,1fr) 14px; justify-items: stretch; gap: .4rem; padding: .55rem; font-size: .72rem; text-align: left; }
+    .social-brand { width: 44px; height: 44px; border-radius: .75rem; }
+    .social-brand :global(svg) { width: 25px; height: 25px; }
+    .social-name { width: auto; overflow: hidden; text-overflow: ellipsis; }
+    .social-dock-links > a > :last-child { display: block; align-self: center; }
   }
 </style>

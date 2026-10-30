@@ -4,13 +4,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import VideoCard from '../components/VideoCard.astro';
 import PlaylistEmbed from '../components/PlaylistEmbed.astro';
 import Icon from '../components/Icon.astro';
+import { withBase } from '../lib/route';
 import type { Video } from '../types';
 
 const videos = (await getCollection('videos')).map(({ id, data }) => ({ id, ...data, publishedAt: data.publishedAt.toISOString() })).sort((a,b) => b.publishedAt.localeCompare(a.publishedAt)) as Video[];
 const structuredData = videos.map((video) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: video.title, thumbnailUrl: video.thumbnail, uploadDate: video.publishedAt, contentUrl: video.url, creator: { '@type': 'Person', name: 'Nafis Al-Muhsin' } }));
 ---
 <BaseLayout title="Visual Qur’an Videos" description="Watch visual Qur’an recitations and translation videos created by Nafis Al-Muhsin." structuredData={structuredData}>
-  <header class="page-hero"><div class="orb"></div><div class="pattern"></div><div class="container reveal"><p class="eyebrow">Visual Qur’an</p><h1>Words you can hear, see, and carry.</h1><p class="lead">Cinematic recitations and clear translations made for attentive listening and meaningful sharing.</p></div></header>
+  <header class="page-hero"><div class="orb"></div><div class="pattern"></div><div class="container reveal"><a class="video-back" href={withBase('/')}><Icon name="back" size={16} /> Back to home</a><p class="eyebrow">Visual Qur’an</p><h1>Words you can hear, see, and carry.</h1><p class="lead">Recitations and clear translations made for attentive listening and meaningful sharing.</p></div></header>
   <section class="section-sm video-library">
     <div class="container">
       <PlaylistEmbed playlistId="PLSw26XuZVejA" />
@@ -23,6 +24,8 @@ const structuredData = videos.map((video) => ({ '@context': 'https://schema.org'
 
 <style>
   .page-hero .pattern { color: var(--emerald); }
+  .video-back { position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: .45rem; margin-bottom: 1.5rem; padding: .4rem .75rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--paper-raised); font-size: .85rem; font-weight: 700; text-decoration: none; }
+  .video-back:hover { border-color: var(--gold); }
   .video-library { background: var(--paper-raised); }
   .video-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; }
   .archive-heading { margin: clamp(3rem,7vw,6rem) 0 1.5rem; }

@@ -37,11 +37,11 @@ const websiteSchema = {
 };
 ---
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="system">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0b0b0c" />
+    <meta name="theme-color" content="#fbf7ed" />
     <meta name="description" content={description} />
     <meta name="author" content={site.name} />
     <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -65,7 +65,7 @@ const websiteSchema = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(image, site.url)} />
     <script is:inline>
-      (() => { document.documentElement.classList.add('js'); try { const preference = localStorage.getItem('nafis:theme') || 'dark'; const theme = preference === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : preference; document.documentElement.dataset.theme = theme; document.documentElement.dataset.themePreference = preference; } catch {} })();
+      (() => { document.documentElement.classList.add('js'); try { const preference = localStorage.getItem('nafis:theme') || 'system'; const theme = preference === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : preference; document.documentElement.dataset.theme = theme; document.documentElement.dataset.themePreference = preference; document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0b0b0c' : '#fbf7ed'); } catch {} })();
     </script>
     <script type="application/ld+json" set:html={JSON.stringify([websiteSchema, ...(structuredData ? (Array.isArray(structuredData) ? structuredData : [structuredData]) : [])])} />
     {plausibleDomain && <script defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>}
@@ -84,6 +84,7 @@ const websiteSchema = {
         const effective = safePreference === 'system' ? (themeQuery.matches ? 'dark' : 'light') : safePreference;
         document.documentElement.dataset.theme = effective;
         document.documentElement.dataset.themePreference = safePreference;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', effective === 'dark' ? '#0b0b0c' : '#fbf7ed');
         document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
           button.setAttribute('aria-label', `Colour theme: ${safePreference}. Activate to choose the next theme.`);
           button.title = `Colour theme: ${safePreference}`;
@@ -100,7 +101,7 @@ const websiteSchema = {
             applyTheme(next);
           });
         });
-        applyTheme(document.documentElement.dataset.themePreference || localStorage.getItem('nafis:theme') || 'dark');
+        applyTheme(document.documentElement.dataset.themePreference || localStorage.getItem('nafis:theme') || 'system');
         const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')), { threshold: .12 });
         document.querySelectorAll<HTMLElement>('.reveal:not(.is-visible)').forEach((element) => observer.observe(element));
       }
