@@ -80,8 +80,8 @@ const personSchema = {
 <style>
   .follow-bar { padding-block: clamp(1.25rem,3vw,2rem); border-bottom: 1px solid var(--line); background: var(--paper-raised); }
   .home-intro { background: var(--paper); }
-  .hero-slider { position: relative; }
-  .hero-viewport { overflow: hidden; }
+  .hero-slider { position: relative; overflow-anchor: none; }
+  .hero-viewport { overflow: hidden; touch-action: pan-y; }
   .hero-track { display: flex; align-items: stretch; transform: translate3d(calc(var(--slide-index, 0) * -100%),0,0); transition: transform 550ms cubic-bezier(.22,.61,.36,1); }
   .hero-slide { display: grid; flex: 0 0 100%; min-width: 0; align-items: center; padding-block: clamp(2rem,4vw,3rem); }
   .welcome-hero { background: var(--paper); }
@@ -124,9 +124,10 @@ const personSchema = {
     if (!slider || slider.dataset.ready) return;
     slider.dataset.ready = 'true';
     const track = slider.querySelector<HTMLElement>('[data-hero-track]');
+    const viewport = slider.querySelector<HTMLElement>('.hero-viewport');
     const slides = [...slider.querySelectorAll<HTMLElement>('[data-hero-slide]')];
     const controls = [...slider.querySelectorAll<HTMLButtonElement>('[data-hero-control]')];
-    if (!track || slides.length < 2) return;
+    if (!track || !viewport || slides.length < 2) return;
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
     const loopSlide = slides[0].cloneNode(true) as HTMLElement;
     loopSlide.removeAttribute('data-hero-slide');
@@ -174,6 +175,24 @@ const personSchema = {
       if (event.detail > 0) control.blur();
       start();
     }));
+    let touchStart: { x: number; y: number } | undefined;
+    viewport.addEventListener('touchstart', (event) => {
+      if (event.touches.length !== 1) return;
+      touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      stop();
+    }, { passive: true });
+    viewport.addEventListener('touchend', (event) => {
+      if (!touchStart || event.changedTouches.length !== 1) return;
+      const deltaX = event.changedTouches[0].clientX - touchStart.x;
+      const deltaY = event.changedTouches[0].clientY - touchStart.y;
+      touchStart = undefined;
+      if (Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+        event.preventDefault();
+        show((active + (deltaX < 0 ? 1 : slides.length - 1)) % slides.length);
+      }
+      start();
+    }, { passive: false });
+    viewport.addEventListener('touchcancel', () => { touchStart = undefined; start(); });
     slider.addEventListener('focusin', stop);
     slider.addEventListener('focusout', () => window.setTimeout(() => { if (!slider.matches(':focus-within')) start(); }, 0));
     reduceMotion.addEventListener('change', start);
